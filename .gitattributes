@@ -1,0 +1,7 @@
+* text=auto
+*.sh text eol=lf
+*.php text eol=lf
+*.hhvm text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.png binary

@@ -1,0 +1,6 @@
+*.tar.gz
+*.zip
+desktop.ini
+.DS_Store
+work/
+
