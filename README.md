@@ -1,12 +1,16 @@
 # Relatório de Caixa para MK-Auth
 
-Addon **Relatório de Caixa 3.4.2** para análise financeira no MK-Auth, com
+Addon **Relatório de Caixa 3.5.0** para análise financeira no MK-Auth, com
 identificação de cliente, login, entradas, saídas, gráficos, evolução,
 ticket médio e anomalias.
 
 Esta distribuição inclui a correção para históricos nos formatos
 `titulo 123`, `titulo: 123`, `título: 123` e `titulo do titulo: 123`, usando
 o ID interno do título para localizar o login e o cliente.
+
+Na versão 3.5.0, a aba Financeiro também oferece busca instantânea por nome
+ou login, filtros clicáveis nos cards de resumo e um ícone de cliente mais
+limpo e consistente com o painel do MK-Auth.
 
 ## Instalação automática
 

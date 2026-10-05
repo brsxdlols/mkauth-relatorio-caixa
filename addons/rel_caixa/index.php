@@ -275,7 +275,36 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         border-radius: 6px;
         border-left: 3px solid;
         box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        cursor: pointer;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        user-select: none;
     }
+
+    .stat-item:hover,
+    .stat-item:focus-visible {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(15, 23, 42, 0.10);
+        outline: none;
+    }
+
+    .stat-item.active-filter {
+        background: #f8fafc;
+        box-shadow: 0 0 0 2px currentColor, 0 6px 16px rgba(15, 23, 42, 0.10);
+    }
+
+    .client-icon-clean {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        margin-right: 6px;
+        color: #64748b;
+        font-size: 16px;
+        vertical-align: -2px;
+    }
+
+    tr.filter-hidden { display: none !important; }
 
     .stat-item.boletos { border-left-color: var(--dark); }
     .stat-item.entradas { border-left-color: var(--info); }
@@ -698,11 +727,70 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         document.getElementById('search').value = '';
         document.getElementById('data_inicial').value = '<?php echo date('Y-m-d'); ?>';
         document.getElementById('data_final').value = '<?php echo date('Y-m-d'); ?>';
-        document.getElementById('searchForm').submit();
+        window.location.href = window.location.pathname;
+    }
+
+    let movementFilter = 'todos';
+
+    function normalizeSearch(value) {
+        return (value || '').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    }
+
+    function applyTableFilters() {
+        const searchInput = document.getElementById('search');
+        const term = normalizeSearch(searchInput ? searchInput.value.trim() : '');
+
+        document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row) {
+            const matchesText = !term || normalizeSearch(row.dataset.search).indexOf(term) !== -1;
+            const movement = row.dataset.movement || 'outro';
+            const matchesMovement = movementFilter === 'todos' || movement === movementFilter;
+            row.classList.toggle('filter-hidden', !(matchesText && matchesMovement));
+        });
+    }
+
+    function setMovementFilter(filter, card) {
+        movementFilter = filter;
+        if (filter === 'saida') {
+            document.querySelectorAll('tr.tarifa-row').forEach(function(row) {
+                row.classList.remove('hidden');
+            });
+            const toggleButton = document.getElementById('toggleButton');
+            if (toggleButton) toggleButton.innerText = 'OCULTAR';
+        }
+        document.querySelectorAll('.stat-item[data-filter]').forEach(function(item) {
+            item.classList.toggle('active-filter', item === card);
+            item.setAttribute('aria-pressed', item === card ? 'true' : 'false');
+        });
+        applyTableFilters();
     }
 
     window.onload = function() {
         toggleTarifaRows();
+
+        const searchInput = document.getElementById('search');
+        const searchForm = document.getElementById('searchForm');
+        if (searchInput) {
+            searchInput.addEventListener('input', applyTableFilters);
+        }
+        if (searchForm) {
+            searchForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+                applyTableFilters();
+            });
+        }
+
+        document.querySelectorAll('.stat-item[data-filter]').forEach(function(card) {
+            card.addEventListener('click', function() {
+                setMovementFilter(card.dataset.filter, card);
+            });
+            card.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setMovementFilter(card.dataset.filter, card);
+                }
+            });
+        });
+        applyTableFilters();
         
         // Verificar se deve abrir uma aba específica
         const urlParams = new URLSearchParams(window.location.search);
@@ -809,7 +897,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <form id="searchForm" method="GET">
                             <div class="form-group">
                                 <label for="search">Buscar Cliente</label>
-                                <input type="text" id="search" name="search" placeholder="Digite o Login do Cliente" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+                                <input type="text" id="search" name="search" placeholder="Digite o nome ou login do cliente" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" autocomplete="off">
                             </div>
                             
                             <div class="form-group">
@@ -847,10 +935,11 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     if (isset($_GET['search'])) {
                         $search_term = mysqli_real_escape_string($link, trim($_GET['search']));
                         $query .= " AND (c.historico LIKE '%$search_term%' OR c.usuario LIKE '%$search_term%' 
-                        OR EXISTS (SELECT 1 FROM sis_lanc sl 
+                        OR EXISTS (SELECT 1 FROM sis_lanc sl
+                                       LEFT JOIN sis_cliente sc ON sc.login = sl.login
                                        WHERE LOWER(c.historico) REGEXP 't[ií]tulo([^0-9]{0,30})[0-9]+' AND 
                                              CAST(SUBSTRING_INDEX(TRIM(TRIM(LEADING ':' FROM TRIM(SUBSTRING_INDEX(LOWER(REPLACE(c.historico, 'título', 'titulo')), 'titulo', -1)))), ' ', 1) AS UNSIGNED) = sl.id AND 
-                                             sl.login LIKE '%$search_term%'))";
+                                             (sl.login LIKE '%$search_term%' OR sc.nome LIKE '%$search_term%')))";
                     }
 
                     $query .= " ORDER BY c.data DESC";
@@ -872,7 +961,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     ?>
 
                     <div class="stats-bar">
-                        <div class="stat-item boletos">
+                        <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente boletos recebidos">
                             <div class="stat-icon">📊</div>
                             <div class="stat-content">
                                 <div class="stat-label">Total Boletos</div>
@@ -880,7 +969,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                             </div>
                         </div>
                         
-                        <div class="stat-item entradas">
+                        <div class="stat-item entradas" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente entradas">
                             <div class="stat-icon">💰</div>
                             <div class="stat-content">
                                 <div class="stat-label">Total Entradas</div>
@@ -888,7 +977,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                             </div>
                         </div>
                         
-                        <div class="stat-item saidas">
+                        <div class="stat-item saidas" data-filter="saida" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente saídas">
                             <div class="stat-icon">💸</div>
                             <div class="stat-content">
                                 <div class="stat-label">Total Saídas</div>
@@ -896,7 +985,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                             </div>
                         </div>
                         
-                        <div class="stat-item saldo">
+                        <div class="stat-item saldo active-filter" data-filter="todos" role="button" tabindex="0" aria-pressed="true" title="Mostrar todos os lançamentos">
                             <div class="stat-icon">✅</div>
                             <div class="stat-content">
                                 <div class="stat-label">Saldo</div>
@@ -921,35 +1010,35 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         <th>📄 Boleto Pago</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="financeTableBody">
                                     <?php mysqli_data_seek($result, 0); ?>
                                     <?php $rowNumber = 0; ?>
                                     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                                         <?php
                                         $nomeClienteClass = ($rowNumber % 2 == 0) ? 'highlight' : '';
                                         $tarifaRowClass = (strpos($row['historico'], 'Tarifa do GerenciaNet') !== false) ? 'tarifa-row' : '';
+                                        $matches = array();
+                                        preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
+                                        $id = isset($matches[1]) ? $matches[1] : '--';
+                                        $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente FROM sis_lanc l
+                                            JOIN sis_cliente c ON l.login = c.login
+                                            WHERE l.id = '$id'";
+                                        $cliente_result = mysqli_query($link, $cliente_query);
+                                        $cliente_row = $cliente_result ? mysqli_fetch_assoc($cliente_result) : null;
+                                        $nome_cliente = isset($cliente_row['nome']) ? $cliente_row['nome'] : '--';
+                                        $login = isset($cliente_row['login']) ? $cliente_row['login'] : '--';
+                                        $uuid_cliente = isset($cliente_row['uuid_cliente']) ? $cliente_row['uuid_cliente'] : '';
+                                        $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
+                                        $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'];
                                         ?>
-                                        <tr class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>">
+                                        <tr class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
-                                                // Aceita "titulo 123", "título: 123" e "titulo do titulo: 123".
-                                                preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
-                                                $id = isset($matches[1]) ? $matches[1] : '--';
-
-                                                $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente FROM sis_lanc l 
-                                                JOIN sis_cliente c ON l.login = c.login
-                                                WHERE l.id = '$id'";
-                                                $cliente_result = mysqli_query($link, $cliente_query);
-                                                $cliente_row = mysqli_fetch_assoc($cliente_result);
-                                                $nome_cliente = isset($cliente_row['nome']) ? $cliente_row['nome'] : '--';
-                                                $login = isset($cliente_row['login']) ? $cliente_row['login'] : '--';
-                                                $uuid_cliente = isset($cliente_row['uuid_cliente']) ? $cliente_row['uuid_cliente'] : '';
-
                                                 $max_length = 20;
                                                 $nome_cliente_truncado = strlen($nome_cliente) > $max_length ? substr($nome_cliente, 0, $max_length) . '...' : $nome_cliente;
 
                                                 echo '<a href="../../cliente_det.hhvm?uuid=' . $uuid_cliente . '" target="_blank" title="' . $nome_cliente . '">';
-                                                echo '<img src="img/icon_cliente.png" alt="Ícone" class="icon-sm">';
+                                                echo '<span class="client-icon-clean" aria-hidden="true"><i class="bi bi-person-circle"></i></span>';
                                                 echo $nome_cliente_truncado;
                                                 echo '</a>';
                                                 ?>

@@ -14,7 +14,7 @@ done
 
 sh -n "$ROOT/install.sh"
 sh -n "$ROOT/rollback.sh"
-grep -q '"version": "3.4.2"' "$ROOT/addons/rel_caixa/manifest.json"
+grep -q '"version": "3.5.0"' "$ROOT/addons/rel_caixa/manifest.json"
 
 php -r '
 $casos = array(
