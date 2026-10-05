@@ -848,8 +848,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         $search_term = mysqli_real_escape_string($link, trim($_GET['search']));
                         $query .= " AND (c.historico LIKE '%$search_term%' OR c.usuario LIKE '%$search_term%' 
                         OR EXISTS (SELECT 1 FROM sis_lanc sl 
-                                       WHERE c.historico REGEXP 'titulo[[:space:]]*:?[[:space:]]*[0-9]+' AND 
-                                             CAST(SUBSTRING_INDEX(TRIM(TRIM(LEADING ':' FROM TRIM(SUBSTRING_INDEX(c.historico, 'titulo', -1)))), ' ', 1) AS UNSIGNED) = sl.id AND 
+                                       WHERE LOWER(c.historico) REGEXP 't[ií]tulo([^0-9]{0,30})[0-9]+' AND 
+                                             CAST(SUBSTRING_INDEX(TRIM(TRIM(LEADING ':' FROM TRIM(SUBSTRING_INDEX(LOWER(REPLACE(c.historico, 'título', 'titulo')), 'titulo', -1)))), ' ', 1) AS UNSIGNED) = sl.id AND 
                                              sl.login LIKE '%$search_term%'))";
                     }
 
@@ -932,8 +932,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         <tr class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>">
                                             <td>
                                                 <?php
-                                                // Aceita tanto "titulo 123" quanto "titulo: 123".
-                                                preg_match('/titulo\s*:?\s*(\d+)/i', $row['historico'], $matches);
+                                                // Aceita "titulo 123", "título: 123" e "titulo do titulo: 123".
+                                                preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
                                                 $id = isset($matches[1]) ? $matches[1] : '--';
 
                                                 $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente FROM sis_lanc l 
