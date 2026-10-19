@@ -343,7 +343,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     .table-wrapper {
         background: white;
         border-radius: 8px;
-        overflow: hidden;
+        overflow-x: auto;
         border: 1px solid var(--border);
     }
 
@@ -351,6 +351,14 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         width: 100%;
         border-collapse: collapse;
     }
+
+    .finance-table { min-width: 1200px; table-layout: auto; }
+    .finance-table th, .finance-table td { white-space: normal; vertical-align: middle; }
+    .finance-table td:first-child { min-width: 240px; }
+    .finance-table td:nth-child(2) { min-width: 150px; overflow-wrap: anywhere; }
+    .finance-table td:nth-child(5) { min-width: 300px; overflow-wrap: anywhere; }
+    .finance-table td:nth-child(3), .finance-table td:nth-child(n+6) { white-space: nowrap; }
+    .finance-table td a { white-space: normal; max-width: 100%; overflow-wrap: anywhere; }
 
     thead {
         background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
@@ -996,7 +1004,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">
-                            <table>
+                            <table class="finance-table">
                                 <thead>
                                     <tr>
                                         <th>👤 Nome do Cliente</th>
@@ -1034,12 +1042,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         <tr class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
-                                                $max_length = 20;
-                                                $nome_cliente_truncado = strlen($nome_cliente) > $max_length ? substr($nome_cliente, 0, $max_length) . '...' : $nome_cliente;
 
-                                                echo '<a href="../../cliente_det.hhvm?uuid=' . $uuid_cliente . '" target="_blank" title="' . $nome_cliente . '">';
+                                                echo '<a href="../../cliente_det.hhvm?uuid=' . htmlspecialchars($uuid_cliente, ENT_QUOTES, 'UTF-8') . '" target="_blank" title="' . htmlspecialchars($nome_cliente, ENT_QUOTES, 'UTF-8') . '">';
                                                 echo '<span class="client-icon-clean" aria-hidden="true"><i class="bi bi-person-circle"></i></span>';
-                                                echo $nome_cliente_truncado;
+                                                echo htmlspecialchars($nome_cliente, ENT_QUOTES, 'UTF-8');
                                                 echo '</a>';
                                                 ?>
                                             </td>
@@ -1049,10 +1055,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                                 $data_inicial = (!empty($_GET['data_inicial'])) ? date('Y-m-d', strtotime($_GET['data_inicial'])) : date('Y-m-d');
                                                 $data_final = (!empty($_GET['data_final'])) ? date('Y-m-d', strtotime($_GET['data_final'])) : date('Y-m-d');
                                                 $link_busca = "?search=" . urlencode($login) . "&data_inicial=" . urlencode($data_inicial) . "&data_final=" . urlencode($data_final);
-                                                $max_length = 15;
-                                                $login_truncado = (strlen($login) > $max_length) ? substr($login, 0, $max_length) . '...' : $login;
                                                 ?>
-                                                <a href="<?php echo $link_busca; ?>" title="<?php echo htmlspecialchars($login); ?>"><?php echo $login_truncado; ?></a>
+                                                <a href="<?php echo $link_busca; ?>" title="<?php echo htmlspecialchars($login); ?>"><?php echo htmlspecialchars($login, ENT_QUOTES, 'UTF-8'); ?></a>
                                             </td>
 
                                             <td style="font-weight: 500;"><?php echo date('d-m-Y H:i:s', strtotime($row['data'])); ?></td>
@@ -1060,12 +1064,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
                                             <td>
                                                 <?php
-                                                $max_length = 32;
                                                 $historico = $row['historico'];
-                                                $historico_abreviado = strlen($historico) > $max_length ? substr($historico, 0, $max_length) . '...' : $historico;
                                                 ?>
                                                 <span style="color: #059669; font-weight: 500;" title="<?php echo htmlspecialchars($historico); ?>">
-                                                    <?php echo htmlspecialchars($historico_abreviado); ?>
+                                                    <?php echo htmlspecialchars($historico); ?>
                                                 </span>
                                             </td>
 
@@ -1181,3 +1183,4 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 </body>
 </html>
+
