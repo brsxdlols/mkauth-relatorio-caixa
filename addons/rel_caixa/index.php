@@ -776,15 +776,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         toggleTarifaRows();
 
         const searchInput = document.getElementById('search');
-        const searchForm = document.getElementById('searchForm');
         if (searchInput) {
             searchInput.addEventListener('input', applyTableFilters);
-        }
-        if (searchForm) {
-            searchForm.addEventListener('submit', function(event) {
-                event.preventDefault();
-                applyTableFilters();
-            });
         }
 
         document.querySelectorAll('.stat-item[data-filter]').forEach(function(card) {
