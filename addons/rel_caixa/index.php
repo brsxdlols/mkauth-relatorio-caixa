@@ -726,11 +726,54 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             white-space: nowrap;
         }
     }
+    .rc-conference { margin: 18px 0; padding: 16px; border: 1px solid var(--border); border-radius: 8px; }
+    .rc-conference p, .rc-tools { margin: 10px 0; font-size: 13px; }
+    .rc-conference summary { padding: 10px 0; cursor: pointer; font-weight: 600; }
+    .rc-summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+    .rc-conference td { overflow-wrap: anywhere; }
+    .rc-print-period { font-size: 12px; margin: 10px 0; }
+    @media print {
+        @page { size: A4 landscape; margin: 10mm; }
+        body, .container { background: white !important; box-shadow: none; margin: 0; overflow: visible; }
+        nav, .navbar, .breadcrumb, .tabs, .search-form, .rc-tools, #content-graficos, #content-ticket, #content-evolucao, #content-anomalias { display: none !important; }
+        #content-financeiro { display: block !important; }
+        .table-wrapper { overflow: visible; }
+        .finance-table { min-width: 0; table-layout: auto; }
+        .finance-table td:first-child, .finance-table td:nth-child(2), .finance-table td:nth-child(5) { min-width: 0; }
+        th, td { font-size: 9px !important; padding: 4px !important; color: black !important; }
+        thead { display: table-header-group; position: static; }
+        tr { break-inside: avoid; }
+        .rc-summary-grid { display: block; }
+    }
 </style>
 
 </head>
 
 <script>
+    function rcExport() {
+        const table = document.querySelector('.finance-table');
+        const rows = table ? Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('hidden') && !row.classList.contains('filter-hidden')) : [];
+        const cell = value => {
+            value = String(value).trim();
+            if (/^[=+@\-\t\r]/.test(value)) value = "'" + value;
+            return '"' + value.replace(/"/g, '""') + '"';
+        };
+        const line = values => values.map(cell).join(';');
+        const amount = value => Math.round(Number(value.replace(/[^0-9,-]/g, '').replace(',', '.')) * 100) || 0;
+        const money = value => (value / 100).toFixed(2).replace('.', ',');
+        let incoming = 0, outgoing = 0;
+        const content = [line(['Conferência de caixa — linhas visíveis']), line([document.querySelector('.rc-print-period').textContent])];
+        if (table) content.push(line(Array.from(table.querySelectorAll('thead th')).map(th => th.textContent)));
+        rows.forEach(row => {
+            const values = Array.from(row.cells).map(td => td.textContent.trim());
+            incoming += amount(values[5]); outgoing += amount(values[6]); content.push(line(values));
+        });
+        content.push(line(['Linhas exportadas', rows.length]), line(['Total entradas', money(incoming)]), line(['Total saídas', money(outgoing)]), line(['Resultado das linhas exportadas', money(incoming - outgoing)]));
+        const url = URL.createObjectURL(new Blob(['\ufeff' + content.join('\r\n')], {type: 'text/csv;charset=utf-8;'}));
+        const a = document.createElement('a'); a.href = url; a.download = 'conferencia-caixa.csv'; a.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
     function clearSearch() {
         document.getElementById('search').value = '';
         document.getElementById('data_inicial').value = '<?php echo date('Y-m-d'); ?>';
@@ -771,6 +814,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         });
         applyTableFilters();
     }
+
+    window.addEventListener('beforeprint', function() { document.querySelectorAll('.rc-conference details').forEach(function(d) { d.dataset.rcOpen = d.open ? '1' : '0'; d.open = true; }); });
+    window.addEventListener('afterprint', function() { document.querySelectorAll('.rc-conference details').forEach(function(d) { d.open = d.dataset.rcOpen === '1'; }); });
 
     window.onload = function() {
         toggleTarifaRows();
@@ -965,7 +1011,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente boletos recebidos">
                             <div class="stat-icon">📊</div>
                             <div class="stat-content">
-                                <div class="stat-label">Total Boletos</div>
+                                <div class="stat-label">Entradas registradas</div>
                                 <div class="stat-value"><?php echo $total_boletos_; ?></div>
                             </div>
                         </div>
@@ -989,12 +1035,15 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <div class="stat-item saldo active-filter" data-filter="todos" role="button" tabindex="0" aria-pressed="true" title="Mostrar todos os lançamentos">
                             <div class="stat-icon">✅</div>
                             <div class="stat-content">
-                                <div class="stat-label">Saldo</div>
+                                <div class="stat-label">Resultado do período</div>
                                 <div class="stat-value">R$ <?php echo number_format($saldo, 2, ',', '.'); ?></div>
                             </div>
                         </div>
                     </div>
 
+                    <?php include('conferencia_content.php'); ?>
+                    <div class="rc-tools"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar Excel (CSV)</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir conferência</button><span> Exportação: linhas visíveis e totais próprios. Impressão: conferência e linhas visíveis.</span></div>
+                    <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">
                             <table class="finance-table">
@@ -1008,7 +1057,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         <th>💵 Entrada</th>
                                         <th>💸 Saída</th>
                                         <th>🆔 ID</th>
-                                        <th>📄 Boleto Pago</th>
+                                        <th>📄 Vencimento</th>
                                     </tr>
                                 </thead>
                                 <tbody id="financeTableBody">
@@ -1176,4 +1225,3 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 </body>
 </html>
-
