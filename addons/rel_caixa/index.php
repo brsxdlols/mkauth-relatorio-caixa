@@ -745,6 +745,71 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         tr { break-inside: avoid; }
         .rc-summary-grid { display: block; }
     }
+
+    /* Visual da conferência: escopo limitado ao addon. */
+    .container { --primary: #2563eb; --primary-dark: #1d4ed8; --success: #059669; width: calc(100% - 48px); max-width: 1800px; margin: 24px auto; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 8px 32px #0f172a08; color: #334155; background: #fff; }
+    .rc-page-header { padding: 28px 32px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+    .rc-eyebrow { color: #64748b; font-size: 11px; letter-spacing: 1.5px; font-weight: 700; }
+    .rc-page-header h1 { margin: 6px 0; font-size: 28px; line-height: 1.2; font-weight: 750; letter-spacing: -.7px; color: #0f172a; }
+    .rc-page-header p { font-size: 14px; color: #64748b; }
+    .rc-app-badge { background: #eff6ff; color: #2563eb; border: 1px solid #dbeafe; border-radius: 9px; padding: 8px 16px; font-weight: 700; font-size: 13px; }
+    .container .tabs-container { border-bottom: 1px solid #e2e8f0; }
+    .container .tabs { padding: 0 32px; gap: 22px; }
+    .container .tab-button { padding: 14px 2px; font-size: 14px; text-transform: none; letter-spacing: 0; font-weight: 600; border-bottom-width: 2px; }
+    .container .tab-button::after { display: none; }
+    .container .tab-button.active { background: transparent; }
+    .container .tab-content { padding: 24px 32px; }
+    .container .content-wrapper { padding: 0; }
+    .container .search-form { padding: 0; border: none; background: transparent; margin: 0 0 24px; }
+    .container #searchForm { display: flex; align-items: flex-end; gap: 12px; flex-wrap: wrap; }
+    .container #searchForm .form-group { flex: 0 1 170px; min-width: 145px; margin: 0; }
+    .container #searchForm .form-group:first-child { flex: 1 1 280px; max-width: 460px; }
+    .container #searchForm label { font-size: 12px; font-weight: 600; text-transform: none; color: #475569; margin-bottom: 7px; }
+    .container #searchForm input { width: 100%; height: 42px; font-size: 14px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; background: #fff; color: #0f172a; }
+    .container .btn { min-height: 42px; padding: 10px 16px; border-radius: 8px; font-size: 13px; text-transform: none; font-weight: 600; letter-spacing: 0; box-shadow: none; }
+    .container .btn-primary { background: #2563eb; border: 1px solid #2563eb; color: #fff; }
+    .container .btn-secondary { background: #fff; border: 1px solid #cbd5e1; color: #475569; }
+    .container .btn:hover { transform: none; filter: brightness(.97); }
+    .container .stats-bar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); padding: 0; gap: 16px; background: transparent; margin: 0 0 18px; }
+    .container .stat-item { padding: 20px; border: 1px solid #e2e8f0 !important; border-radius: 10px; box-shadow: none; background: white; min-height: 100px; }
+    .container .stat-item.active-filter { outline: none; background: #eff6ff; border-color: #bfdbfe !important; }
+    .container .stat-icon { display: none; }
+    .container .stat-label { font-size: 12px; text-transform: none; letter-spacing: 0; margin-bottom: 8px; color: #64748b; }
+    .container .stat-value { font-size: 26px; line-height: 1.2; letter-spacing: -.5px; }
+    .container .stat-item.entradas .stat-value { color: #059669; }
+    .container .stat-item.saidas .stat-value { color: #dc2626; }
+    .container .stat-item.saldo .stat-value { color: #1d4ed8; }
+    .container .rc-conference { margin: 0 0 24px; padding: 0; border: 1px solid #dbe5ec; border-radius: 10px; overflow: hidden; }
+    .rc-status-line { padding: 14px 18px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 12px; background: #f8fafc; }
+    .rc-status-line strong { color: #0f172a; font-size: 13px; }
+    .rc-status-dot { width: 8px; height: 8px; border-radius: 50%; background: #64748b; flex-shrink: 0; }
+    .rc-scope { margin-left: auto; color: #64748b; }
+    .rc-analysis > summary { list-style: none; padding: 12px 18px; color: #2563eb; font-size: 13px; border-top: 1px solid #e2e8f0; }
+    .rc-analysis > summary::after { content: '+'; float: right; font-size: 17px; }
+    .rc-analysis[open] > summary::after { content: '−'; }
+    .rc-analysis > summary span { color: #64748b; font-weight: 400; margin-left: 12px; font-size: 12px; }
+    .rc-analysis > p, .rc-analysis > details, .rc-analysis > div { margin: 12px 18px; }
+    .rc-analysis p { color: #64748b; line-height: 1.6; }
+    .rc-tools { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin: 0 0 16px; flex-wrap: wrap; }
+    .rc-tools h2 { font-size: 18px; font-weight: 700; color: #0f172a; margin: 0; }
+    .rc-tools p { color: #64748b; font-size: 12px; margin: 4px 0 0; }
+    .rc-tool-actions { display: flex; gap: 8px; }
+    .rc-print-period { display: none; }
+    .container .table-wrapper { border-radius: 10px; border-color: #e2e8f0; }
+    .container thead { background: #f8fafc; box-shadow: none; }
+    .container th { color: #64748b; padding: 13px 14px; font-size: 11px; text-shadow: none; letter-spacing: .4px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    .container td { padding: 13px 14px; font-size: 13px; color: #334155; }
+    .container tbody tr.highlight { background: white; }
+    .container tbody tr:nth-child(even) { background: #fcfdff; }
+    .container tbody tr:hover { background: #f1f5f9; }
+    .container td a { font-weight: 500; color: #2563eb; }
+    .container .badge { border-radius: 5px; padding: 4px 7px; font-size: 12px; font-weight: 600; }
+    .container .badge-info { background: #f1f5f9; color: #475569; }
+    .container .badge-info img { display: none; }
+    .container .finance-table td:nth-child(6), .container .finance-table td:nth-child(7) { text-align: right; font-variant-numeric: tabular-nums; }
+    @media (max-width: 900px) { .container { width: calc(100% - 20px); margin: 12px auto; } .rc-page-header { padding: 22px 18px; } .rc-page-header h1 { font-size: 23px; } .container .tabs { padding: 0 18px; overflow-x: auto; gap: 18px; } .container .tab-content { padding: 20px 18px; } .container .stats-bar { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; } .container .stat-item { padding: 16px; } .container .stat-value { font-size: 22px; } .rc-analysis > summary span { display: none; } }
+    @media print { .container { width: 100%; max-width: none; border: 0; margin: 0; box-shadow: none; } .rc-page-header { padding: 0 0 12px; } .rc-app-badge, .tabs-container { display: none; } .container .tab-content { padding: 0; } .rc-print-period { display: block; } .rc-status-line { padding: 8px; } .rc-analysis > summary::after { display: none; } .container .stat-item { padding: 8px; min-height: 0; } .container .stat-value { font-size: 17px; } .container th, .container td { font-size: 9px; padding: 4px; } }
+
 </style>
 
 </head>
@@ -806,7 +871,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 row.classList.remove('hidden');
             });
             const toggleButton = document.getElementById('toggleButton');
-            if (toggleButton) toggleButton.innerText = 'OCULTAR';
+            if (toggleButton) toggleButton.innerText = 'Ocultar tarifas';
         }
         document.querySelectorAll('.stat-item[data-filter]').forEach(function(item) {
             item.classList.toggle('active-filter', item === card);
@@ -863,9 +928,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         });
 
         if (toggleButton && toggleButton.innerText === 'MOSTRAR') {
-            toggleButton.innerText = 'OCULTAR';
+            toggleButton.innerText = 'Ocultar tarifas';
         } else if (toggleButton) {
-            toggleButton.innerText = 'MOSTRAR';
+            toggleButton.innerText = 'Mostrar tarifas';
         }
     }
 
@@ -903,32 +968,25 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     <?php include('../../topo.php'); ?>
 
     <div class="container">
-        <nav class="breadcrumb" aria-label="breadcrumbs">
-            <ul>
-                <li><a href="#">ADDON</a></li>
-                <li class="is-active">
-                    <a href="#" aria-current="page"><?php echo htmlspecialchars($manifestTitle . " - V " . $manifestVersion); ?></a>
-                </li>
-            </ul>
-        </nav>
+        <header class="rc-page-header"><div><span class="rc-eyebrow">FINANCEIRO / MK-AUTH</span><h1>Conferência de caixa</h1><p>Movimentações, recebimentos e pendências em um só lugar.</p></div><span class="rc-app-badge">Caixa</span></header>
 
         <!-- TABS -->
         <div class="tabs-container">
             <div class="tabs">
                 <button class="tab-button active" id="tab-financeiro" onclick="switchTab('financeiro')">
-                    📋 FINANCEIRO
+                    Movimentações
                 </button>
                 <button class="tab-button" id="tab-graficos" onclick="switchTab('graficos')">
-                    📊 GRÁFICOS
+                    Gráficos
                 </button>
                 <button class="tab-button" id="tab-ticket" onclick="switchTab('ticket')">
-                    🎫 TICKET
+                    Ticket médio
                 </button>
                 <button class="tab-button" id="tab-evolucao" onclick="switchTab('evolucao')">
-                    📈 EVOLUÇÃO
+                    Evolução
                 </button>
                 <button class="tab-button" id="tab-anomalias" onclick="switchTab('anomalias')">
-                    🔍 ANOMALIAS
+                    Anomalias
                 </button>
             </div>
         </div>
@@ -943,23 +1001,23 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     <div class="search-form">
                         <form id="searchForm" method="GET">
                             <div class="form-group">
-                                <label for="search">Buscar Cliente</label>
-                                <input type="text" id="search" name="search" placeholder="Digite o nome ou login do cliente" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" autocomplete="off">
+                                <label for="search">Cliente ou login</label>
+                                <input type="text" id="search" name="search" placeholder="Pesquisar cliente ou login…" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>" autocomplete="off">
                             </div>
                             
                             <div class="form-group">
-                                <label for="data_inicial">Data Inicial</label>
+                                <label for="data_inicial">De</label>
                                 <input type="date" id="data_inicial" name="data_inicial" value="<?php echo isset($_GET['data_inicial']) ? htmlspecialchars($_GET['data_inicial']) : date('Y-m-d'); ?>">
                             </div>
                             
                             <div class="form-group">
-                                <label for="data_final">Data Final</label>
+                                <label for="data_final">Até</label>
                                 <input type="date" id="data_final" name="data_final" value="<?php echo isset($_GET['data_final']) ? htmlspecialchars($_GET['data_final']) : date('Y-m-d'); ?>">
                             </div>
                             
-                            <button type="submit" class="btn btn-primary">Buscar</button>
+                            <button type="submit" class="btn btn-primary">Aplicar período</button>
                             <button type="button" onclick="clearSearch()" class="btn btn-secondary">Limpar</button>
-                            <button type="button" id="toggleButton" onclick="toggleTarifaRows()" class="btn btn-secondary">Ocultar</button>
+                            <button type="button" id="toggleButton" onclick="toggleTarifaRows()" class="btn btn-secondary">Ocultar tarifas</button>
                         </form>
                     </div>
 
@@ -1011,7 +1069,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente boletos recebidos">
                             <div class="stat-icon">📊</div>
                             <div class="stat-content">
-                                <div class="stat-label">Entradas registradas</div>
+                                <div class="stat-label">Recebimentos</div>
                                 <div class="stat-value"><?php echo $total_boletos_; ?></div>
                             </div>
                         </div>
@@ -1019,7 +1077,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <div class="stat-item entradas" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente entradas">
                             <div class="stat-icon">💰</div>
                             <div class="stat-content">
-                                <div class="stat-label">Total Entradas</div>
+                                <div class="stat-label">Entradas</div>
                                 <div class="stat-value">R$ <?php echo number_format($tot_entrada, 2, ',', '.'); ?></div>
                             </div>
                         </div>
@@ -1027,7 +1085,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         <div class="stat-item saidas" data-filter="saida" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente saídas">
                             <div class="stat-icon">💸</div>
                             <div class="stat-content">
-                                <div class="stat-label">Total Saídas</div>
+                                <div class="stat-label">Saídas</div>
                                 <div class="stat-value">R$ <?php echo number_format($tot_saida, 2, ',', '.'); ?></div>
                             </div>
                         </div>
@@ -1042,22 +1100,22 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     </div>
 
                     <?php include('conferencia_content.php'); ?>
-                    <div class="rc-tools"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar Excel (CSV)</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir conferência</button><span> Exportação: linhas visíveis e totais próprios. Impressão: conferência e linhas visíveis.</span></div>
+                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Consulte os detalhes de cada movimentação.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">
                             <table class="finance-table">
                                 <thead>
                                     <tr>
-                                        <th>👤 Nome do Cliente</th>
-                                        <th>🔑 Login</th>
-                                        <th>📅 Data</th>
-                                        <th>👨‍💼 Usuário</th>
-                                        <th>📝 Histórico</th>
-                                        <th>💵 Entrada</th>
-                                        <th>💸 Saída</th>
-                                        <th>🆔 ID</th>
-                                        <th>📄 Vencimento</th>
+                                        <th>Cliente</th>
+                                        <th>Login</th>
+                                        <th>Movimentação</th>
+                                        <th>Usuário</th>
+                                        <th>Histórico</th>
+                                        <th>Entrada</th>
+                                        <th>Saída</th>
+                                        <th>Título</th>
+                                        <th>Vencimento</th>
                                     </tr>
                                 </thead>
                                 <tbody id="financeTableBody">
