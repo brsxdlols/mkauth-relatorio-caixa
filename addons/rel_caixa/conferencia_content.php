@@ -70,13 +70,15 @@ try {
 }
 ?>
 <section class="rc-conference">
-    <h3>Conferência do período</h3>
+    <div class="rc-status-line"><span class="rc-status-dot"></span><strong><?php echo $rc_error ? "Conferência indisponível" : (count($rc_alerts) ? count($rc_alerts) . " itens para revisar" : "Nenhum alerta encontrado"); ?></strong><span><?php echo rc_escape($rc_label); ?></span><span class="rc-scope">Todos os clientes do período</span></div>
+    <details class="rc-analysis"><summary>Ver conferência e resumos <span>Por dia, usuário e pagamento</span></summary>
+
     <p><?php echo rc_escape($rc_label); ?> · Resumos e alertas consideram todos os clientes do período.</p>
     <p>Resultado do período = entradas − saídas. Não inclui saldo anterior nem representa saldo bancário.</p>
     <?php if ($rc_error): ?>
         <p role="alert">Não foi possível calcular a conferência. Verifique o período e tente novamente. Nenhum resultado foi considerado conferido.</p>
     <?php else: ?>
-        <details open><summary>Itens para conferir: <?php echo count($rc_alerts); ?></summary>
+        <details><summary>Itens para conferir: <?php echo count($rc_alerts); ?></summary>
         <p>Alertas são indícios para revisão. A identificação depende do ID do título no histórico; compare também com o extrato bancário.</p>
         <?php if (!$rc_alerts): ?><p>Nenhuma divergência encontrada nas verificações disponíveis.</p><?php else: ?>
         <div class="table-wrapper"><table><thead><tr><th>Alerta</th><th>Título</th><th>Login</th><th>Detalhe</th><th>Valor / diferença</th></tr></thead><tbody>
@@ -92,4 +94,5 @@ try {
         </div>
         <p>A forma de pagamento vem do título vinculado; saídas vinculadas são agrupadas na mesma forma.</p>
     <?php endif; ?>
+    </details>
 </section>
