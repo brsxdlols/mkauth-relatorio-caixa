@@ -747,7 +747,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     }
 
     /* Visual da conferência: escopo limitado ao addon. */
-    .container { --primary: #2563eb; --primary-dark: #1d4ed8; --success: #059669; width: calc(100% - 48px); max-width: 1800px; margin: 24px auto; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 8px 32px #0f172a08; color: #334155; background: #fff; }
+    .container { --primary: #2563eb; --primary-dark: #1d4ed8; --success: #059669; width: calc(100% - 32px); max-width: none; margin: 24px auto; border: 1px solid #e2e8f0; border-radius: 16px; box-shadow: 0 8px 32px #0f172a08; color: #334155; background: #fff; }
     .rc-page-header { padding: 28px 32px 22px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
     .rc-eyebrow { color: #64748b; font-size: 11px; letter-spacing: 1.5px; font-weight: 700; }
     .rc-page-header h1 { margin: 6px 0; font-size: 28px; line-height: 1.2; font-weight: 750; letter-spacing: -.7px; color: #0f172a; }
@@ -797,19 +797,26 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     .rc-print-period { display: none; }
     .container .table-wrapper { border-radius: 10px; border-color: #e2e8f0; }
     .container thead { background: #f8fafc; box-shadow: none; }
-    .container th { color: #64748b; padding: 13px 14px; font-size: 11px; text-shadow: none; letter-spacing: .4px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
-    .container td { padding: 13px 14px; font-size: 13px; color: #334155; }
+    .container th { color: #64748b; padding: 14px 14px; font-size: 12px; text-shadow: none; letter-spacing: .4px; border-bottom: 1px solid #e2e8f0; white-space: nowrap; }
+    .container td { padding: 14px 14px; font-size: 15px; color: #334155; }
     .container tbody tr.highlight { background: white; }
     .container tbody tr:nth-child(even) { background: #fcfdff; }
     .container tbody tr:hover { background: #f1f5f9; }
     .container td a { font-weight: 500; color: #2563eb; }
-    .container .badge { border-radius: 5px; padding: 4px 7px; font-size: 12px; font-weight: 600; }
+    .container .badge { border-radius: 5px; padding: 4px 7px; font-size: 14px; font-weight: 600; }
     .container .badge-info { background: #f1f5f9; color: #475569; }
     .container .badge-info img { display: none; }
     .container .finance-table td:nth-child(6), .container .finance-table td:nth-child(7) { text-align: right; font-variant-numeric: tabular-nums; }
     @media (max-width: 900px) { .container { width: calc(100% - 20px); margin: 12px auto; } .rc-page-header { padding: 22px 18px; } .rc-page-header h1 { font-size: 23px; } .container .tabs { padding: 0 18px; overflow-x: auto; gap: 18px; } .container .tab-content { padding: 20px 18px; } .container .stats-bar { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; } .container .stat-item { padding: 16px; } .container .stat-value { font-size: 22px; } .rc-analysis > summary span { display: none; } }
     @media print { .container { width: 100%; max-width: none; border: 0; margin: 0; box-shadow: none; } .rc-page-header { padding: 0 0 12px; } .rc-app-badge, .tabs-container { display: none; } .container .tab-content { padding: 0; } .rc-print-period { display: block; } .rc-status-line { padding: 8px; } .rc-analysis > summary::after { display: none; } .container .stat-item { padding: 8px; min-height: 0; } .container .stat-value { font-size: 17px; } .container th, .container td { font-size: 9px; padding: 4px; } }
 
+    @media screen {
+        #rc-caixa.container { width: calc(100% - 32px); max-width: none; }
+        #rc-caixa .finance-table td { font-size: 15px; line-height: 1.5; }
+        #rc-caixa #searchForm label { font-size: 13px; }
+        #rc-caixa #searchForm input, #rc-caixa .btn { font-size: 15px; }
+    }
+    @media screen and (max-width: 900px) { #rc-caixa.container { width: calc(100% - 20px); } }
 </style>
 
 </head>
@@ -967,7 +974,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <body>
     <?php include('../../topo.php'); ?>
 
-    <div class="container">
+    <div class="container" id="rc-caixa">
         <header class="rc-page-header"><div><span class="rc-eyebrow">FINANCEIRO / MK-AUTH</span><h1>Conferência de caixa</h1><p>Movimentações, recebimentos e pendências em um só lugar.</p></div><span class="rc-app-badge">Caixa</span></header>
 
         <!-- TABS -->
