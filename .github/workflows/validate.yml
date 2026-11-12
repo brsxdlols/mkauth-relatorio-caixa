@@ -1,13 +1,18 @@
 name: Validate
-
 on:
   push:
   pull_request:
-
 jobs:
   validate:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ['7.3', '8.0', '8.3']
     steps:
       - uses: actions/checkout@v4
-      - name: Validate addon and installers
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli
+      - name: Validate addon and safe installer
         run: sh scripts/validate.sh

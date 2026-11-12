@@ -1,113 +1,38 @@
 #!/bin/sh
 set -eu
-
-REPO="brsxdlols/mkauth-relatorio-caixa"
-MK_ROOT="/opt/mk-auth"
-ADDONS_DIR="$MK_ROOT/admin/addons"
-TARGET="$ADDONS_DIR/rel_caixa"
-BACKUP_ROOT="$MK_ROOT/backups"
-STAMP="$(date +%Y%m%d_%H%M%S)"
-BACKUP_DIR="$BACKUP_ROOT/rel_caixa-$STAMP"
-TMP_DIR="$(mktemp -d /tmp/rel_caixa_install.XXXXXX)"
-ARCHIVE="$TMP_DIR/source.tar.gz"
-
-cleanup() {
-    rm -rf "$TMP_DIR"
-}
-trap cleanup EXIT INT TERM
-
-if [ "$(id -u)" -ne 0 ]; then
-    echo "Erro: execute como root." >&2
-    exit 1
-fi
-
-if [ ! -d "$ADDONS_DIR" ]; then
-    echo "Erro: diretório do MK-Auth não encontrado: $ADDONS_DIR" >&2
-    exit 1
-fi
-
-if ! command -v php >/dev/null 2>&1; then
-    echo "Erro: PHP não encontrado." >&2
-    exit 1
-fi
-
-mkdir -p "$BACKUP_DIR"
-
-if [ -d "$TARGET" ]; then
-    cp -a "$TARGET" "$BACKUP_DIR/rel_caixa"
-fi
-
-if [ -f "$ADDONS_DIR/addon_aplicativos.js" ]; then
-    cp -a "$ADDONS_DIR/addon_aplicativos.js" "$BACKUP_DIR/addon_aplicativos.js"
-fi
-
-if [ -f "$ADDONS_DIR/addon.js" ]; then
-    cp -a "$ADDONS_DIR/addon.js" "$BACKUP_DIR/addon.js"
-fi
-
-if command -v curl >/dev/null 2>&1; then
-    curl -fL "https://github.com/$REPO/archive/refs/heads/main.tar.gz" -o "$ARCHIVE"
-elif command -v wget >/dev/null 2>&1; then
-    wget -O "$ARCHIVE" "https://github.com/$REPO/archive/refs/heads/main.tar.gz"
-else
-    echo "Erro: instale curl ou wget." >&2
-    exit 1
-fi
-
-tar -xzf "$ARCHIVE" -C "$TMP_DIR"
-SOURCE_DIR="$(find "$TMP_DIR" -mindepth 1 -maxdepth 1 -type d -name 'mkauth-relatorio-caixa-*' | head -n 1)"
-
-if [ -z "$SOURCE_DIR" ] || [ ! -f "$SOURCE_DIR/addons/rel_caixa/index.php" ]; then
-    echo "Erro: pacote baixado inválido." >&2
-    exit 1
-fi
-
-for file in "$SOURCE_DIR"/addons/rel_caixa/*.php; do
-    php -l "$file" >/dev/null
+ROOT=/opt/mk-auth
+REF=main
+SOURCE=
+NO_MENU=
+while [ "$#" -gt 0 ]; do
+    case "$1" in
+        --source) SOURCE="$2"; shift 2 ;;
+        --root) ROOT="$2"; shift 2 ;;
+        --ref) REF="$2"; shift 2 ;;
+        --no-menu) NO_MENU=--no-menu; shift ;;
+        *) echo "Opção inválida: $1" >&2; exit 1 ;;
+    esac
 done
-
-mkdir -p "$TARGET"
-cp -a "$SOURCE_DIR/addons/rel_caixa/." "$TARGET/"
-cp -a "$SOURCE_DIR/rollback.sh" "$TARGET/rollback.sh"
-chmod 755 "$TARGET/rollback.sh"
-find "$TARGET" -type d -exec chmod 755 {} \;
-find "$TARGET" -type f -exec chmod 644 {} \;
-chmod 755 "$TARGET/rollback.sh"
-chown -R root:root "$TARGET"
-
-MENU_APP="$ADDONS_DIR/addon_aplicativos.js"
-MENU_DEFAULT="$ADDONS_DIR/addon.js"
-MENU_LINK='    <a href="/admin/addons/rel_caixa/" class="navbar-item"><i class="bi bi-coin"></i>&nbsp; <b>Caixa</b></a>'
-
-if [ -f "$MENU_APP" ] && grep -q 'id="menu_amsis"' "$MENU_APP"; then
-    if ! grep -q '/admin/addons/rel_caixa' "$MENU_APP"; then
-        awk -v link="$MENU_LINK" '
-            { print }
-            /id="menu_amsis"/ && !inserted { print link; inserted=1 }
-        ' "$MENU_APP" > "$TMP_DIR/menu.js"
-        cat "$TMP_DIR/menu.js" > "$MENU_APP"
-    fi
-    MENU_USED="$MENU_APP"
-else
-    if [ ! -f "$MENU_DEFAULT" ]; then
-        touch "$MENU_DEFAULT"
-    fi
-    if ! grep -q 'REL_CAIXA_MENU_INI' "$MENU_DEFAULT"; then
-        {
-            printf '\n// REL_CAIXA_MENU_INI\n'
-            printf '%s\n' 'add_menu.financeiro('\''{"plink": "'\'' + minha_url + '\''addons/rel_caixa/", "ptext": "<b>Caixa</b>"}'\'');'
-            printf '%s\n' '// REL_CAIXA_MENU_FIM'
-        } >> "$MENU_DEFAULT"
-    fi
-    MENU_USED="$MENU_DEFAULT"
+[ "$(id -u)" -eq 0 ] || { echo 'Execute como root.' >&2; exit 1; }
+command -v php >/dev/null || { echo 'PHP não encontrado.' >&2; exit 1; }
+TMP_DIR="$(mktemp -d /tmp/rel_caixa_install.XXXXXX)"
+trap 'rm -rf -- "$TMP_DIR"' EXIT
+trap 'exit 1' HUP INT TERM
+if [ -z "$SOURCE" ]; then
+    case "$REF" in *[!a-zA-Z0-9._-]*|'') echo 'Ref inválida.' >&2; exit 1;; esac
+    URL="https://github.com/brsxdlols/mkauth-relatorio-caixa/archive/$REF.tar.gz"
+    if command -v curl >/dev/null; then curl -fL "$URL" -o "$TMP_DIR/source.tar.gz"; else wget -O "$TMP_DIR/source.tar.gz" "$URL"; fi
+    tar -tzf "$TMP_DIR/source.tar.gz" > "$TMP_DIR/files"
+    if grep -Eq '(^/|(^|/)\.\.(/|$))' "$TMP_DIR/files" || tar -tvzf "$TMP_DIR/source.tar.gz" | grep -Eq '^[lh]'; then echo 'Pacote contém caminho/link inseguro.' >&2; exit 1; fi
+    mkdir "$TMP_DIR/extracted"
+    tar -xzf "$TMP_DIR/source.tar.gz" --no-same-owner -C "$TMP_DIR/extracted"
+    SOURCE="$(find "$TMP_DIR/extracted" -mindepth 1 -maxdepth 1 -type d | head -n 1)"
 fi
-
-printf '%s\n' "$MENU_USED" > "$BACKUP_DIR/menu-usado.txt"
-printf '%s\n' "$BACKUP_DIR" > "$TARGET/.ultimo_backup"
-
-echo "Relatório de Caixa instalado com sucesso."
-echo "Destino: $TARGET"
-echo "Atalho: $MENU_USED"
-echo "Backup: $BACKUP_DIR"
-echo "Acesso: /admin/addons/rel_caixa/"
-
+SOURCE="$(CDPATH= cd -- "$SOURCE" && pwd -P)"
+[ -f "$SOURCE/deploy.php" ] || { echo 'deploy.php ausente.' >&2; exit 1; }
+[ -z "$(find -P "$SOURCE" -type l -print -quit)" ] || { echo 'Pacote com link simbólico recusado.' >&2; exit 1; }
+find "$SOURCE/addons/rel_caixa" -type f -name '*.php' -exec php -l {} \; > "$TMP_DIR/lint"
+# find -exec does not propagate a failed command status; explicitly validate each PHP file.
+find "$SOURCE/addons/rel_caixa" -type f -name '*.php' -exec sh -c 'for file do php -l "$file" >/dev/null || exit 1; done' sh {} +
+php -l "$SOURCE/deploy.php" >/dev/null
+if [ -n "$NO_MENU" ]; then php "$SOURCE/deploy.php" install "$SOURCE" "$ROOT" --no-menu; else php "$SOURCE/deploy.php" install "$SOURCE" "$ROOT"; fi

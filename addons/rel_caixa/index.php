@@ -817,6 +817,18 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         #rc-caixa #searchForm input, #rc-caixa .btn { font-size: 15px; }
     }
     @media screen and (max-width: 900px) { #rc-caixa.container { width: calc(100% - 20px); } }
+    .bt-heading { display: flex; justify-content: space-between; align-items: center; gap: 18px; margin-bottom: 22px; }
+    .bt-heading h2 { font-size: 24px; font-weight: 700; color: #0f172a; }
+    .bt-heading p, .bt-note { color: #64748b; font-size: 13px; margin: 8px 0 18px; }
+    .bt-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: end; margin: 18px 0; padding: 18px; border: 1px solid #e2e8f0; border-radius: 10px; background: #f8fafc; }
+    .bt-form label { display: flex; flex-direction: column; gap: 7px; font-size: 12px; color: #475569; flex: 1 1 170px; }
+    .bt-form input, .bt-form select { padding: 10px; height: 42px; border: 1px solid #cbd5e1; border-radius: 7px; background: white; font-size: 14px; min-width: 0; width: 100%; color: #0f172a; }
+    .bt-warning { border: 1px solid #fde68a; border-radius: 10px; background: #fffbeb; color: #92400e; padding: 16px; margin: 18px 0; font-size: 14px; }
+    .bt-warning p { margin-top: 6px; font-size: 13px; }
+    .bt-wallets { margin: 16px 0; } .bt-wallets summary { cursor: pointer; padding: 12px 0; font-size: 14px; font-weight: 600; }
+    .bt-table { min-width: 1150px; } .bt-table td { max-width: 330px; vertical-align: top; overflow-wrap: anywhere; } .bt-table small { color: #64748b; }
+    .bt-table td p { margin: 0 0 10px; } .bt-pagination { display: flex; align-items: center; justify-content: end; gap: 12px; font-size: 13px; margin-top: 18px; }
+    .container .tabs { flex-wrap: wrap; }
 </style>
 
 </head>
@@ -915,7 +927,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const urlParams = new URLSearchParams(window.location.search);
         const activeTab = urlParams.get('tab');
         
-        if (activeTab === 'graficos') {
+        if (activeTab === 'carteiras' || activeTab === 'problemas') {
+            switchTab(activeTab);
+        } else if (activeTab === 'graficos') {
             switchTab('graficos');
         } else if (activeTab === 'ticket') {
             switchTab('ticket');
@@ -942,6 +956,14 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     }
 
     function switchTab(tabName) {
+        if (tabName === 'carteiras' || tabName === 'problemas') {
+            const targetUrl = new URL(window.location.href);
+            if (targetUrl.searchParams.get('tab') !== tabName) {
+                targetUrl.search = ''; targetUrl.searchParams.set('tab', tabName);
+                window.location.href = targetUrl.toString(); return;
+            }
+        }
+
         // Remove active class from all tabs and contents
         document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -952,7 +974,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         
         // Atualizar URL com a aba ativa (sem recarregar a página)
         const currentUrl = new URL(window.location.href);
-        if (tabName === 'graficos' || tabName === 'ticket' || tabName === 'evolucao' || tabName === 'anomalias') {
+        if (tabName === 'carteiras' || tabName === 'problemas' || tabName === 'graficos' || tabName === 'ticket' || tabName === 'evolucao' || tabName === 'anomalias') {
             currentUrl.searchParams.set('tab', tabName);
         } else {
             // Remove o parâmetro tab quando voltar para financeiro
@@ -992,6 +1014,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 <button class="tab-button" id="tab-evolucao" onclick="switchTab('evolucao')">
                     Evolução
                 </button>
+                <button class="tab-button" id="tab-carteiras" onclick="switchTab('carteiras')">Títulos por banco</button>
+                <button class="tab-button" id="tab-problemas" onclick="switchTab('problemas')">Problemas nos boletos</button>
                 <button class="tab-button" id="tab-anomalias" onclick="switchTab('anomalias')">
                     Anomalias
                 </button>
@@ -1226,6 +1250,12 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 </div>
             </div>
 
+            <div id="content-carteiras" class="tab-content"><div class="content-wrapper">
+                <?php if (isset($_GET['tab']) && $_GET['tab'] === 'carteiras') include('titulos_content.php'); ?>
+            </div></div>
+            <div id="content-problemas" class="tab-content"><div class="content-wrapper">
+                <?php if (isset($_GET['tab']) && $_GET['tab'] === 'problemas') include('titulos_content.php'); ?>
+            </div></div>
             <!-- TAB CONTENT: GRÁFICOS -->
             <div id="content-graficos" class="tab-content">
                 <div class="content-wrapper">
