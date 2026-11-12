@@ -54,6 +54,36 @@ function cx_remove($path) {
     foreach (new DirectoryIterator($path) as $entry) if (!$entry->isDot()) cx_remove($entry->getPathname());
     if (!rmdir($path)) throw new RuntimeException('Falha ao remover diretório temporário.');
 }
+function cx_prepare_templates($stage, $target, $addons) {
+    $uid = null; $gid = null;
+    $explicit = getenv('REL_CAIXA_WEB_USER');
+    if ($explicit !== false && $explicit !== '') {
+        $user = function_exists('posix_getpwnam') ? posix_getpwnam($explicit) : false;
+        if (!$user || $user['uid'] === 0) throw new RuntimeException('REL_CAIXA_WEB_USER deve indicar o usuário não root do PHP.');
+        $uid = $user['uid']; $gid = $user['gid'];
+    } else {
+        foreach (array($target, $addons) as $candidate) {
+            if (is_dir($candidate) && fileowner($candidate) > 0) { $uid = fileowner($candidate); $gid = filegroup($candidate); break; }
+        }
+        if ($uid === null && function_exists('posix_getpwnam')) {
+            $user = posix_getpwnam('www-data');
+            if ($user) { $uid = $user['uid']; $gid = $user['gid']; }
+        }
+    }
+    if ($uid === null) throw new RuntimeException('Informe REL_CAIXA_WEB_USER para preparar a pasta dos modelos.');
+    foreach (array($stage . '/data', $stage . '/data/loja') as $dir) {
+        if (is_link($dir) || (cx_exists($dir) && !is_dir($dir))) throw new RuntimeException('Pasta dos modelos insegura: ' . $dir);
+        if (!is_dir($dir) && !mkdir($dir, 0700)) throw new RuntimeException('Falha ao preparar pasta dos modelos.');
+        if (!chown($dir, $uid) || !chgrp($dir, $gid) || !chmod($dir, 0700)) throw new RuntimeException('Falha ao configurar acesso aos modelos.');
+    }
+    foreach (new DirectoryIterator($stage . '/data/loja') as $entry) {
+        if ($entry->isDot()) continue;
+        if ($entry->isLink()) throw new RuntimeException('Link na pasta de modelos recusado.');
+        if ($entry->isFile() && preg_match('/^[a-f0-9]{64}\.php$/', $entry->getFilename())) {
+            if (!chown($entry->getPathname(), $uid) || !chgrp($entry->getPathname(), $gid) || !chmod($entry->getPathname(), 0600)) throw new RuntimeException('Falha ao configurar modelo existente.');
+        }
+    }
+}
 if (PHP_SAPI !== 'cli') { http_response_code(403); exit; }
 if (version_compare(PHP_VERSION, '7.3', '<')) { fwrite(STDERR, "PHP 7.3+ necessário.\n"); exit(1); }
 $stage = null; $old = null; $target = null; $installed = false;
@@ -94,6 +124,7 @@ try {
         if (dirname($source) !== $backups || !is_dir($source . '/rel_caixa') || is_link($source . '/rel_caixa')) throw new RuntimeException('Backup de atualização inválido. Primeira instalação deve ser removida manualmente.');
         cx_copy($source . '/rel_caixa', $stage, true, true);
     }
+    if ($mode === 'install') cx_prepare_templates($stage, $target, $addons);
     // Never write through a symlink in the backup pointer.
     $pointer = $stage . '/.ultimo_backup';
     if (cx_exists($pointer)) { if (is_dir($pointer) && !is_link($pointer)) throw new RuntimeException('Ponteiro de backup inválido.'); unlink($pointer); }

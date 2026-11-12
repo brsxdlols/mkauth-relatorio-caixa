@@ -2,7 +2,7 @@
 // Preferences only. Stores no payment records and never uses the native database.
 function lj_templates($dir,$user,$action='read',$name='',$filter=array()) {
     if($user==='')throw new RuntimeException('Usuário não identificado para salvar modelos.');
-    foreach(array(dirname($dir),$dir) as $path){if(is_link($path))throw new RuntimeException('Diretório de modelos simbólico recusado.');if(!is_dir($path) && !mkdir($path,0700))throw new RuntimeException('Sem permissão para criar a pasta dos modelos.');}
+    foreach(array(dirname($dir),$dir) as $path){if(is_link($path))throw new RuntimeException('Diretório de modelos simbólico recusado.');if(!is_dir($path) && !@mkdir($path,0700) && !is_dir($path))throw new RuntimeException('Sem permissão para criar a pasta dos modelos.');}
     $path=$dir.'/'.hash('sha256',$user).'.php';$prefix="<?php http_response_code(404); exit; ?>\n";
     if(is_link($path))throw new RuntimeException('Arquivo de modelos simbólico recusado.');
     if(!file_exists($path)){$initial=@fopen($path,'x');if($initial){fwrite($initial,$prefix.base64_encode('{}'));fclose($initial);chmod($path,0600);}}

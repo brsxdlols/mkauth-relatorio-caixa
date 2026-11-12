@@ -1,3 +1,9 @@
+# Atualização 3.7.1
+
+O instalador prepara `data/loja` antes do primeiro acesso, com modo 0700 e acesso do PHP. Mantém modelos existentes e recusa links. Detecta o proprietário não root do addon/diretório de addons; se necessário, usa `www-data`. Em pools personalizados, execute `REL_CAIXA_WEB_USER=usuario_php sh install.sh ...`. A correção só muda permissões dos arquivos de preferências do addon, sem alterar permissões de usuários no MK-Auth ou configurações nativas.
+
+Períodos sem movimentos agora mostram a data do último lançamento e um link explícito para consultar esse dia sem filtros de forma/conta/usuário.
+
 # Caixa 3.7.0 — Caixa da loja e modelos
 
 Esta versão acrescenta a guia **Caixa da loja**, sem duplicar lançamentos ou separar fisicamente saldos no banco nativo.

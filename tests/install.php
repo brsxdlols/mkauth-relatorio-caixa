@@ -9,6 +9,8 @@ symlink($native,$target.'/addons.class.php');symlink($native,$target.'/index.php
 function ck($ok,$text){if(!$ok)throw new RuntimeException($text);}
 function runDeploy($source,$mode,$input,$root){$cmd=escapeshellarg(PHP_BINARY).' '.escapeshellarg($source.'/deploy.php').' '.escapeshellarg($mode).' '.escapeshellarg($input).' '.escapeshellarg($root).' --no-menu 2>&1';exec($cmd,$output,$status);clearstatcache();return array($status,implode("\n",$output));}
 list($code,$output)=runDeploy($source,'install',$source,$root);ck($code===0,$output);
+ck(is_dir($target.'/data/loja'),'Pasta de modelos não preparada');
+ck((fileperms($target.'/data/loja')&0777)===0700,'Modelos devem ser privados');
 ck(file_get_contents($target.'/data/loja/user.php')==='SAVED-MODEL','Modelo perdido na atualização');
 ck(file_get_contents($native)==='NATIVE-SENTINEL','Arquivo nativo alterado');
 ck(is_link($target.'/addons.class.php'),'Link do carregador nativo perdido');
@@ -19,6 +21,11 @@ list($code,$output)=runDeploy($source,'rollback',$backup,$root);ck($code===0,$ou
 // A symlink in an existing destination directory must abort before activation.
 mkdir($base.'/assets');symlink($base.'/assets',$target.'/img');
 list($code,$output)=runDeploy($source,'install',$source,$root);ck($code!==0,'Diretório simbólico foi seguido');ck(is_link($target.'/index.php'),'Instalação recusada alterou addon');
+// Fresh installation must prepare writable, private storage before the first page view.
+$fresh=$base.'/fresh';mkdir($fresh.'/admin/addons',0755,true);
+list($code,$output)=runDeploy($source,'install',$source,$fresh);ck($code===0,$output);
+ck(is_dir($fresh.'/admin/addons/rel_caixa/data/loja'),'Primeira instalação não prepara modelos');
+ck((fileperms($fresh.'/admin/addons/rel_caixa/data/loja')&0777)===0700,'Permissão da pasta nova');
 // A root symlink must also be rejected.
 symlink($root,$base.'/alias');list($code,$output)=runDeploy($source,'install',$source,$base.'/alias');ck($code!==0,'Raiz simbólica aceita');
 echo "OK: configuração, modos, backups, rollback e links simbólicos; fixture: $base\n";

@@ -1,3 +1,11 @@
+# 3.7.1 — 2026-11-12
+
+- Prepara a pasta dos modelos durante a instalação, com proprietário do PHP e modo 0700; preserva o conteúdo e recusa links.
+- Aceita REL_CAIXA_WEB_USER para instalações com usuário PHP personalizado.
+- Trata criação concorrente da pasta sem falha indevida.
+- Informa quando o período não tem movimentos e oferece acesso ao último dia registrado.
+- Testa o provisionamento de modelos também em instalação nova.
+
 # 3.7.0 — 2026-11-12
 
 - Caixa da loja com filtros múltiplos de recebimento, conta e usuário, catálogo nativo e formas utilizadas.
