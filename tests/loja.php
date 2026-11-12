@@ -1,0 +1,12 @@
+<?php
+require dirname(__DIR__).'/addons/rel_caixa/titulos_lib.php';require dirname(__DIR__).'/addons/rel_caixa/loja_lib.php';require dirname(__DIR__).'/addons/rel_caixa/loja_templates.php';
+function lo_check($condition,$message){if(!$condition)throw new RuntimeException($message);}
+$r=array('historico'=>'Descontado a tarifa do titulo: 4359','entrada'=>'0.00','saida'=>'1.38','usuario'=>'lorena','_method'=>'pix','_account'=>'1','_name'=>'Cliente','_login'=>'cliente','_fee'=>true);
+lo_check(lj_fee($r),'Tarifa Lytex identificada');$r['historico']='Tarifa Sicredi do título 123 / cliente';lo_check(lj_fee($r),'Tarifa Sicredi identificada');$r['entrada']='10.00';$r['saida']='0';lo_check(!lj_fee($r),'Entrada não é tarifa');$r['entrada']='0';$r['saida']='1.38';
+$f=lj_filter(array('lo_formas'=>array('dinheiro','pix'),'lo_contas'=>array('1'),'lo_usuarios'=>array('lorena'),'lo_inicio'=>'2026-11-11','lo_fim'=>'2026-11-12'));
+lo_check(lj_matches($r,$f),'Filtros OR dentro da dimensão e AND entre dimensões');$f['users']=array('bruno');lo_check(!lj_matches($r,$f),'Usuário isolado');$f['users']=array();$f['fees']='ocultar';lo_check(!lj_matches($r,$f),'Tarifa excluída');$f['fees']='incluir';$f['methods']=array('dinheiro');lo_check(!lj_matches($r,$f),'PIX não entra em dinheiro');
+$r2=$r;$r2['entrada']='100.00';$r2['saida']='0';$r2['_fee']=false;$s=lj_summary(array($r,$r2));lo_check($s['incoming']===10000&&$s['outgoing']===138&&$s['count']===1&&$s['fees']===138,'Totais em centavos');
+lo_check(lj_key('PIX')===lj_key('pix')&&lj_key('Cartão')==='cartao','Opções normalizadas');
+$dir=sys_get_temp_dir().'/loja-model-test-'.bin2hex(random_bytes(5)).'/loja';$saved=$f;unset($saved['start'],$saved['end']);lj_templates($dir,'bruno','save','Dinheiro e PIX',$saved);lo_check(isset(lj_templates($dir,'bruno')['Dinheiro e PIX']),'Persistência');lo_check(lj_templates($dir,'lorena')===array(),'Isolamento de usuário');lo_check(!isset(lj_templates($dir,'bruno')['Dinheiro e PIX']['start']),'Modelo sem congelar datas');lj_templates($dir,'bruno','delete','Dinheiro e PIX');lo_check(lj_templates($dir,'bruno')===array(),'Exclusão');
+$native=$dir.'/native';file_put_contents($native,'SENTINEL');$path=$dir.'/'.hash('sha256','evil').'.php';symlink($native,$path);$refused=false;try{lj_templates($dir,'evil','save','x',array());}catch(Throwable $e){$refused=true;}lo_check($refused&&file_get_contents($native)==='SENTINEL','Template não segue link');
+echo "OK: tarifas, filtros combinados, totais, modelos isolados e links.\n";

@@ -1,6 +1,7 @@
 <?php
 // INCLUE FUNCOES DE ADDONS -----------------------------------------------------------------------
 include('addons.class.php');
+require_once __DIR__ . '/loja_lib.php';
 
 // VERIFICA SE O USUARIO ESTA LOGADO --------------------------------------------------------------
 session_name('mka');
@@ -829,6 +830,23 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     .bt-table { min-width: 1150px; } .bt-table td { max-width: 330px; vertical-align: top; overflow-wrap: anywhere; } .bt-table small { color: #64748b; }
     .bt-table td p { margin: 0 0 10px; } .bt-pagination { display: flex; align-items: center; justify-content: end; gap: 12px; font-size: 13px; margin-top: 18px; }
     .container .tabs { flex-wrap: wrap; }
+    .lo-multis { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; width: 100%; }
+    .lo-multis details, .lo-models, .lo-summaries details { border: 1px solid #e2e8f0; border-radius: 9px; background: #fff; padding: 14px; }
+    .lo-multis summary, .lo-models summary, .lo-summaries summary { cursor: pointer; font-size: 14px; font-weight: 600; margin-bottom: 10px; }
+    .lo-checks { max-height: 180px; overflow-y: auto; display: grid; gap: 7px; margin-bottom: 8px; }
+    .container .lo-checks label { display: flex; flex-direction: row; align-items: center; gap: 8px; flex: initial; font-size: 13px; text-transform: none; }
+    .container .lo-checks input { width: 17px; height: 17px; padding: 0; flex-shrink: 0; }
+    .lo-actions { display: flex; gap: 9px; flex-wrap: wrap; }
+    .lo-models { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 18px 0; }
+    .lo-models p, .lo-multis small { font-size: 12px; color: #64748b; }
+    .lo-models select, .lo-models input:not([type=hidden]):not([type=checkbox]) { padding: 10px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 14px; }
+    .lo-models label { display: block; margin: 9px 0; font-size: 13px; text-transform: none; }
+    .lo-message { padding: 12px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; font-size: 14px; }
+    .lo-summaries { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; margin: 18px 0; }
+    .lo-table { min-width: 1200px; } .lo-table td { vertical-align: top; overflow-wrap: anywhere; max-width: 330px; }
+    .lo-period { margin: 12px 0; font-size: 13px; color: #475569; }
+    @media(max-width:900px) { .lo-multis, .lo-summaries { grid-template-columns: 1fr; } }
+    @media print { body:has(#content-loja.active) #content-financeiro { display: none !important; } #content-loja .lo-form, #content-loja .lo-models, #content-loja .rc-tools button, #content-loja .bt-pagination { display: none !important; } .lo-table { min-width: 0; } .lo-summaries { display: block; } }
 </style>
 
 </head>
@@ -866,6 +884,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     }
 
     let movementFilter = 'todos';
+    let tariffsVisible = true;
 
     function normalizeSearch(value) {
         return (value || '').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -875,17 +894,27 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const searchInput = document.getElementById('search');
         const term = normalizeSearch(searchInput ? searchInput.value.trim() : '');
 
+        let incoming = 0, outgoing = 0, receipts = 0;
+        const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row');
+        const feeButton = document.getElementById('toggleButton');
+        if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Ocultar tarifas' : 'Mostrar tarifas'); }
         document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row) {
             const matchesText = !term || normalizeSearch(row.dataset.search).indexOf(term) !== -1;
             const movement = row.dataset.movement || 'outro';
             const matchesMovement = movementFilter === 'todos' || movement === movementFilter;
+            const feeHidden = row.classList.contains('tarifa-row') && !tariffsVisible;
+            row.classList.toggle('hidden', feeHidden);
             row.classList.toggle('filter-hidden', !(matchesText && matchesMovement));
+            if (matchesText && matchesMovement && !feeHidden) { incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0); if (Number(row.dataset.incoming || 0) > 0) receipts++; }
         });
+        const money = value => 'R$ ' + (value / 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        [['boletos', receipts], ['entradas', money(incoming)], ['saidas', money(outgoing)], ['saldo', money(incoming - outgoing)]].forEach(item => { const value = document.querySelector('#content-financeiro .stat-item.' + item[0] + ' .stat-value'); if (value) value.textContent = item[1]; });
     }
 
     function setMovementFilter(filter, card) {
         movementFilter = filter;
         if (filter === 'saida') {
+            tariffsVisible = true;
             document.querySelectorAll('tr.tarifa-row').forEach(function(row) {
                 row.classList.remove('hidden');
             });
@@ -903,7 +932,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     window.addEventListener('afterprint', function() { document.querySelectorAll('.rc-conference details').forEach(function(d) { d.open = d.dataset.rcOpen === '1'; }); });
 
     window.onload = function() {
-        toggleTarifaRows();
+        applyTableFilters();
 
         const searchInput = document.getElementById('search');
         if (searchInput) {
@@ -927,7 +956,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const urlParams = new URLSearchParams(window.location.search);
         const activeTab = urlParams.get('tab');
         
-        if (activeTab === 'carteiras' || activeTab === 'problemas') {
+        if (activeTab === 'loja' || activeTab === 'carteiras' || activeTab === 'problemas') {
             switchTab(activeTab);
         } else if (activeTab === 'graficos') {
             switchTab('graficos');
@@ -941,22 +970,12 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     };
 
     function toggleTarifaRows() {
-        var tarifaRows = document.querySelectorAll('tr.tarifa-row');
-        var toggleButton = document.getElementById('toggleButton');
-
-        tarifaRows.forEach(function(row) {
-            row.classList.toggle('hidden');
-        });
-
-        if (toggleButton && toggleButton.innerText === 'MOSTRAR') {
-            toggleButton.innerText = 'Ocultar tarifas';
-        } else if (toggleButton) {
-            toggleButton.innerText = 'Mostrar tarifas';
-        }
+        tariffsVisible = !tariffsVisible;
+        applyTableFilters();
     }
 
     function switchTab(tabName) {
-        if (tabName === 'carteiras' || tabName === 'problemas') {
+        if (tabName === 'loja' || tabName === 'carteiras' || tabName === 'problemas') {
             const targetUrl = new URL(window.location.href);
             if (targetUrl.searchParams.get('tab') !== tabName) {
                 targetUrl.search = ''; targetUrl.searchParams.set('tab', tabName);
@@ -974,7 +993,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         
         // Atualizar URL com a aba ativa (sem recarregar a página)
         const currentUrl = new URL(window.location.href);
-        if (tabName === 'carteiras' || tabName === 'problemas' || tabName === 'graficos' || tabName === 'ticket' || tabName === 'evolucao' || tabName === 'anomalias') {
+        if (tabName === 'loja' || tabName === 'carteiras' || tabName === 'problemas' || tabName === 'graficos' || tabName === 'ticket' || tabName === 'evolucao' || tabName === 'anomalias') {
             currentUrl.searchParams.set('tab', tabName);
         } else {
             // Remove o parâmetro tab quando voltar para financeiro
@@ -1014,6 +1033,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 <button class="tab-button" id="tab-evolucao" onclick="switchTab('evolucao')">
                     Evolução
                 </button>
+                <button class="tab-button" id="tab-loja" onclick="switchTab('loja')">Caixa da loja</button>
                 <button class="tab-button" id="tab-carteiras" onclick="switchTab('carteiras')">Títulos por banco</button>
                 <button class="tab-button" id="tab-problemas" onclick="switchTab('problemas')">Problemas nos boletos</button>
                 <button class="tab-button" id="tab-anomalias" onclick="switchTab('anomalias')">
@@ -1097,7 +1117,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     ?>
 
                     <div class="stats-bar">
-                        <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente boletos recebidos">
+                        <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente recebimentos">
                             <div class="stat-icon">📊</div>
                             <div class="stat-content">
                                 <div class="stat-label">Recebimentos</div>
@@ -1130,6 +1150,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         </div>
                     </div>
 
+<p class="bt-note">Cards, CSV e impressão consideram as linhas visíveis. Ocultar tarifas retira essas saídas dos totais dos cards. A conferência abaixo mantém a visão completa do período.</p>
                     <?php include('conferencia_content.php'); ?>
                     <div class="rc-tools"><div><h2>Lançamentos</h2><p>Consulte os detalhes de cada movimentação.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
@@ -1155,7 +1176,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                     <?php while ($row = mysqli_fetch_assoc($result)) : ?>
                                         <?php
                                         $nomeClienteClass = ($rowNumber % 2 == 0) ? 'highlight' : '';
-                                        $tarifaRowClass = (strpos($row['historico'], 'Tarifa do GerenciaNet') !== false) ? 'tarifa-row' : '';
+                                        $tarifaRowClass = lj_fee($row) ? 'tarifa-row' : '';
                                         $matches = array();
                                         preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
                                         $id = isset($matches[1]) ? $matches[1] : '--';
@@ -1170,7 +1191,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
                                         $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'];
                                         ?>
-                                        <tr class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <tr data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
 
@@ -1250,6 +1271,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 </div>
             </div>
 
+            <div id="content-loja" class="tab-content"><div class="content-wrapper">
+                <?php if (isset($_GET['tab']) && $_GET['tab'] === 'loja') include('loja_content.php'); ?>
+            </div></div>
             <div id="content-carteiras" class="tab-content"><div class="content-wrapper">
                 <?php if (isset($_GET['tab']) && $_GET['tab'] === 'carteiras') include('titulos_content.php'); ?>
             </div></div>

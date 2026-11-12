@@ -1,3 +1,11 @@
+# 3.7.0 — 2026-11-12
+
+- Caixa da loja com filtros múltiplos de recebimento, conta e usuário, catálogo nativo e formas utilizadas.
+- Modelos salvos por usuário no servidor, sem alterações em tabelas financeiras.
+- Resumos, CSV e impressão da seleção completa.
+- Corrige identificação e botão de tarifas; totais dos cards acompanham linhas visíveis.
+- Testes de tarifas, filtros, valores, persistência e isolamento de modelos.
+
 # 3.6.0 — 2026-11-07
 
 - Adiciona Títulos por banco/carteira e Problemas nos boletos.

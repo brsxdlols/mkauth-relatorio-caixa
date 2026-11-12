@@ -1,3 +1,26 @@
+# Caixa 3.7.0 — Caixa da loja e modelos
+
+Esta versão acrescenta a guia **Caixa da loja**, sem duplicar lançamentos ou separar fisicamente saldos no banco nativo.
+
+- Filtros combinados por várias formas de pagamento, contas do título e usuários do lançamento.
+- As formas incluem as opções padrão do MK-Auth, os itens personalizados de `dados/item.db` (`titulos_formapag`, aberto somente para leitura) e os valores utilizados em `sis_lanc.formapag`.
+- Dinheiro e PIX manual são separados das opções de integração, como `boleto-lytex` e `pix-lytex`. Use o atalho Dinheiro + PIX ou monte sua própria seleção.
+- Resumos por usuário e forma, CSV do resultado completo filtrado, impressão e paginação.
+- Modelos por usuário persistidos no servidor em `addons/rel_caixa/data/loja/`, fora das tabelas financeiras. Sem salvar datas, o modelo abre no dia atual. A instalação e seus backups preservam esses arquivos personalizados.
+- As preferências usam arquivos `.php` com guarda de acesso, conteúdo codificado, permissão 0600, bloqueio de escrita e proteção contra links. O diretório precisa ser gravável pelo usuário do PHP. Falhas para salvar são exibidas; não há fallback silencioso.
+- Salvamento, aplicação e exclusão de modelos exigem sessão e a permissão existente do addon, além de token CSRF nas operações POST. Um usuário não acessa modelos de outro.
+- Correção do botão de tarifas na guia Movimentações: reconhece Lytex, Sicredi e demais históricos de tarifa. Sem tarifas no período, o botão informa isso. Os cards dessa guia somam as linhas visíveis, acompanhando a pesquisa, tipo de movimento e visibilidade de tarifas.
+
+**Origem das informações:** os valores e o usuário são do lançamento em `sis_caixa`; a forma de pagamento e a conta são do título vinculado pelo ID no histórico. Alterações posteriores no título podem afetar essa classificação. Movimentos sem vínculo permanecem não identificados. Não se presume que todo lançamento `aut` seja bancário: o MK-Auth também usa esse marcador em recebimentos manuais.
+
+A guia é uma conferência; não recebe títulos, não cria um segundo lançamento, não emite boletos, não altera carteira do cliente e não constitui saldo físico com abertura/fechamento e sangrias. Para conferir a loja, selecione as formas e os atendentes desejados.
+
+Compatibilidade: PHP 7.3 e 8.x. A extensão SQLite3 é opcional; sem ela, o addon avisa que o catálogo personalizado não pôde ser lido, preservando opções padrão e utilizadas. Testes: `sh scripts/validate.sh`.
+
+Para integrar à suíte, use o commit fixado da publicação 3.7.0 e execute o instalador completo com `--source /checkout --no-menu`. Nunca copie sobre links do carregador nativo. A documentação da instalação segura abaixo continua válida; a versão atual de VERSION e manifest.json é 3.7.0.
+
+---
+
 # Caixa para MK-Auth — 3.6.0
 
 Fonte oficial: `brsxdlols/mkauth-relatorio-caixa`.

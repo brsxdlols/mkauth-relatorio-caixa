@@ -4,10 +4,12 @@ $source=dirname(__DIR__);$base=sys_get_temp_dir().'/caixa-test-'.bin2hex(random_
 mkdir($base,0700);$root=$base.'/mk';mkdir($root.'/admin/addons/rel_caixa',0755,true);
 $target=$root.'/admin/addons/rel_caixa';$native=$base.'/native.php';file_put_contents($native,'NATIVE-SENTINEL');
 file_put_contents($target.'/config.php','CUSTOM-CONFIG');chmod($target.'/config.php',0640);
+mkdir($target.'/data/loja',0700,true);file_put_contents($target.'/data/loja/user.php','SAVED-MODEL');chmod($target.'/data/loja/user.php',0600);
 symlink($native,$target.'/addons.class.php');symlink($native,$target.'/index.php');
 function ck($ok,$text){if(!$ok)throw new RuntimeException($text);}
 function runDeploy($source,$mode,$input,$root){$cmd=escapeshellarg(PHP_BINARY).' '.escapeshellarg($source.'/deploy.php').' '.escapeshellarg($mode).' '.escapeshellarg($input).' '.escapeshellarg($root).' --no-menu 2>&1';exec($cmd,$output,$status);clearstatcache();return array($status,implode("\n",$output));}
 list($code,$output)=runDeploy($source,'install',$source,$root);ck($code===0,$output);
+ck(file_get_contents($target.'/data/loja/user.php')==='SAVED-MODEL','Modelo perdido na atualização');
 ck(file_get_contents($native)==='NATIVE-SENTINEL','Arquivo nativo alterado');
 ck(is_link($target.'/addons.class.php'),'Link do carregador nativo perdido');
 ck(!is_link($target.'/index.php'),'Link de arquivo atualizado não foi substituído com segurança');
