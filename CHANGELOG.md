@@ -1,3 +1,9 @@
+# 3.7.2 — 2026-11-16
+
+- Retoma o layout clássico compacto com faixa superior, abas, cards e cabeçalho de tabela em azul do datacenter.
+- Preserva todas as guias, filtros, modelos, nomes completos e rolagem horizontal.
+- Tema limitado ao addon, sem modificar o menu nativo do MK-Auth.
+
 # 3.7.1 — 2026-11-12
 
 - Prepara a pasta dos modelos durante a instalação, com proprietário do PHP e modo 0700; preserva o conteúdo e recusa links.

@@ -847,6 +847,88 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     .lo-period { margin: 12px 0; font-size: 13px; color: #475569; }
     @media(max-width:900px) { .lo-multis, .lo-summaries { grid-template-columns: 1fr; } }
     @media print { body:has(#content-loja.active) #content-financeiro { display: none !important; } #content-loja .lo-form, #content-loja .lo-models, #content-loja .rc-tools button, #content-loja .bt-pagination { display: none !important; } .lo-table { min-width: 0; } .lo-summaries { display: block; } }
+
+    /* Classic compact layout, in the datacenter blue palette. Scoped to the addon. */
+    @media screen {
+        #rc-caixa.container { --primary: #087bd3; --primary-dark: #075cae; --info: #198fe0; width: calc(100% - 24px); max-width: none; margin: 14px auto; border: 0; border-radius: 8px; box-shadow: 0 5px 18px #0c244322; }
+        #rc-caixa .rc-page-header { min-height: 44px; padding: 10px 20px; background: linear-gradient(110deg, #155cc5 0%, #098ddb 65%, #26b7eb 100%); color: white; border-radius: 8px 8px 0 0; }
+        #rc-caixa .rc-page-header > div { display: flex; align-items: center; gap: 15px; }
+        #rc-caixa .rc-page-header .rc-eyebrow { color: #edf8ff; font-size: 11px; letter-spacing: .6px; }
+        #rc-caixa .rc-page-header h1 { color: white; font-size: 15px; font-weight: 600; letter-spacing: 0; margin: 0; line-height: 1.4; }
+        #rc-caixa .rc-page-header .rc-eyebrow::after { content: '/'; margin-left: 14px; opacity: .65; }
+        #rc-caixa .rc-page-header .rc-app-badge { color: #fff; background: #ffffff18; border-color: #ffffff60; border-radius: 4px; padding: 3px 9px; font-size: 11px; }
+        #rc-caixa .tabs { padding: 12px 16px 0; gap: 2px; flex-wrap: wrap; }
+        #rc-caixa .tabs-container { border-bottom: 1px solid #dbe5f1; }
+        #rc-caixa .tab-button { padding: 10px; font-size: 12px; text-transform: uppercase; letter-spacing: .2px; border-bottom: 2px solid transparent; gap: 6px; }
+        #rc-caixa .tab-button:not(:last-child)::after { display: block; content: '|'; font-size: 12px; right: -3px; padding: 0; color: #c8d7e8; }
+        #rc-caixa .tab-button.active { color: #087bd3; background: #f3f8ff; border-bottom-color: #138de1; }
+        #rc-caixa .tab-button:hover { color: #087bd3; background: #f3f8ff; }
+        #rc-caixa .tab-content { padding: 22px 20px; }
+        #rc-caixa .content-wrapper { padding: 0; }
+        #rc-caixa .search-form { padding: 12px 14px; background: #f6f8fb; border: 1px solid #dfe6ef; border-radius: 6px; margin: 5px 0 12px; }
+        #rc-caixa #searchForm { justify-content: flex-start; gap: 9px; }
+        #rc-caixa #searchForm .form-group { flex: 0 1 180px; min-width: 145px; }
+        #rc-caixa #searchForm .form-group:first-child { flex: 0 1 250px; max-width: 300px; }
+        #rc-caixa #searchForm label { font-size: 11px; margin-bottom: 5px; text-transform: uppercase; }
+        #rc-caixa #searchForm input { height: 36px; font-size: 13px; padding: 7px 10px; border-color: #d7e1ed; border-radius: 4px; }
+        #rc-caixa .btn { min-height: 34px; padding: 7px 12px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+        #rc-caixa .btn-primary { background: #087bd3; border-color: #087bd3; color: white; }
+        #rc-caixa .btn-secondary { background: #fff; border-color: #1689d7; color: #086cb9; }
+        #rc-caixa .btn-secondary:hover { background: #eaf5ff; }
+        #rc-caixa .btn:disabled { opacity: .55; cursor: default; }
+        #rc-caixa .stats-bar { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; padding: 9px 11px; background: linear-gradient(110deg,#f5f7fa,#e9edf2); border-radius: 7px; margin: 12px 0; }
+        #rc-caixa .stat-item { display: flex; align-items: center; gap: 9px; min-height: 62px; padding: 10px 12px; border: 0 !important; border-left: 3px solid #3f638c !important; border-radius: 5px; background: white; box-shadow: 0 2px 4px #0b294d0a; }
+        #rc-caixa .stat-icon { display: inline-flex; font-size: 20px; opacity: .9; }
+        #rc-caixa .stat-item.entradas { border-left-color: #1593e1 !important; }
+        #rc-caixa .stat-item.saidas { border-left-color: #f05265 !important; }
+        #rc-caixa .stat-item.saldo { border-left-color: #087bd3 !important; }
+        #rc-caixa .stat-item.active-filter { outline: 1px solid #459cde; outline-offset: 0; background: #f1f8ff; box-shadow: none; }
+        #rc-caixa .stat-label { font-size: 11px; text-transform: uppercase; letter-spacing: .2px; margin-bottom: 4px; color: #506781; }
+        #rc-caixa .stat-value { font-size: 19px; line-height: 1.2; letter-spacing: 0; }
+        #rc-caixa .stat-item.entradas .stat-value { color: #1386d3; }
+        #rc-caixa .stat-item.saldo .stat-value { color: #086ab5; }
+        #rc-caixa .stat-item.saidas .stat-value { color: #e53e54; }
+        #rc-caixa .rc-conference { margin: 12px 0; border-color: #d9e6f3; border-radius: 5px; }
+        #rc-caixa .rc-status-line { padding: 8px 12px; background: #f3f8fd; font-size: 11px; gap: 10px; }
+        #rc-caixa .rc-status-line strong { font-size: 12px; }
+        #rc-caixa .rc-analysis > summary { padding: 8px 12px; font-size: 12px; }
+        #rc-caixa .rc-tools { margin: 12px 0 9px; }
+        #rc-caixa .rc-tools h2 { font-size: 15px; }
+        #rc-caixa .rc-tools p { font-size: 11px; margin-top: 3px; }
+        #rc-caixa .table-wrapper { border-radius: 6px; border-color: #dbe4ef; }
+        #rc-caixa thead { background: linear-gradient(110deg, #176bd0 0%, #1199e1 100%); }
+        #rc-caixa th { padding: 11px 10px; color: #fff; font-size: 12px; font-weight: 700; letter-spacing: .35px; text-shadow: 0 1px 1px #06417c35; border-bottom: 1px solid #0c6fba; }
+        #rc-caixa td, #rc-caixa .finance-table td { font-size: 13.5px; padding: 10px; line-height: 1.4; }
+        #rc-caixa tbody tr:nth-child(even), #rc-caixa tbody tr.highlight { background: #f5f7fa; }
+        #rc-caixa tbody tr:hover { background: #eaf4ff; }
+        #rc-caixa td a { color: #0978c8; font-weight: 500; }
+        #rc-caixa .badge { font-size: 12px; padding: 3px 6px; border-radius: 4px; }
+        #rc-caixa .badge-success { background: #e0f3ff; color: #0869ab; }
+        #rc-caixa .badge-info { background: #e4efff; color: #1262ad; }
+        #rc-caixa .client-icon-clean { color: #688bad; }
+        #rc-caixa .bt-heading { margin-bottom: 14px; gap: 12px; }
+        #rc-caixa .bt-heading h2 { font-size: 20px; color: #17466f; }
+        #rc-caixa .bt-heading p, #rc-caixa .bt-note { font-size: 12px; margin: 6px 0 12px; }
+        #rc-caixa .bt-form { padding: 12px; margin: 12px 0; border-radius: 6px; background: #f6f8fb; }
+        #rc-caixa .bt-form input, #rc-caixa .bt-form select { height: 36px; padding: 7px 9px; font-size: 13px; border-radius: 4px; }
+        #rc-caixa .lo-checks input { width: 16px; height: 16px; }
+        #rc-caixa .lo-multis details, #rc-caixa .lo-models, #rc-caixa .lo-summaries details { padding: 11px; border-radius: 5px; }
+        #rc-caixa .lo-multis summary, #rc-caixa .lo-models summary, #rc-caixa .lo-summaries summary { font-size: 13px; color: #25547d; }
+        #rc-caixa .lo-checks label { font-size: 12px; }
+        #rc-caixa .lo-models { margin: 12px 0; }
+        #rc-caixa .rc-app-badge { padding: 5px 9px; font-size: 11px; border-radius: 4px; }
+    }
+    @media screen and (max-width: 900px) {
+        #rc-caixa.container { width: calc(100% - 16px); margin: 9px auto; }
+        #rc-caixa .tab-content { padding: 16px 12px; }
+        #rc-caixa .tabs { padding: 7px 7px 0; gap: 0; }
+        #rc-caixa .tab-button { font-size: 11px; padding: 10px; }
+        #rc-caixa .stats-bar { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; padding: 8px; }
+        #rc-caixa .stat-item { min-height: 58px; padding: 8px; }
+        #rc-caixa .stat-value { font-size: 17px; }
+        #rc-caixa .rc-page-header { padding: 9px 12px; }
+    }
+
 </style>
 
 </head>
@@ -1016,28 +1098,28 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     <?php include('../../topo.php'); ?>
 
     <div class="container" id="rc-caixa">
-        <header class="rc-page-header"><div><span class="rc-eyebrow">FINANCEIRO / MK-AUTH</span><h1>Conferência de caixa</h1><p>Movimentações, recebimentos e pendências em um só lugar.</p></div><span class="rc-app-badge">Caixa</span></header>
+        <header class="rc-page-header"><div><span class="rc-eyebrow">ADDON</span><h1>Relatório de Caixa</h1></div><span class="rc-app-badge">v<?php echo htmlspecialchars($manifestVersion, ENT_QUOTES, 'UTF-8'); ?></span></header>
 
         <!-- TABS -->
         <div class="tabs-container">
             <div class="tabs">
                 <button class="tab-button active" id="tab-financeiro" onclick="switchTab('financeiro')">
-                    Movimentações
+                    <span aria-hidden="true">📋</span> Movimentações
                 </button>
                 <button class="tab-button" id="tab-graficos" onclick="switchTab('graficos')">
-                    Gráficos
+                    <span aria-hidden="true">📊</span> Gráficos
                 </button>
                 <button class="tab-button" id="tab-ticket" onclick="switchTab('ticket')">
-                    Ticket médio
+                    <span aria-hidden="true">🎫</span> Ticket médio
                 </button>
                 <button class="tab-button" id="tab-evolucao" onclick="switchTab('evolucao')">
-                    Evolução
+                    <span aria-hidden="true">📈</span> Evolução
                 </button>
-                <button class="tab-button" id="tab-loja" onclick="switchTab('loja')">Caixa da loja</button>
-                <button class="tab-button" id="tab-carteiras" onclick="switchTab('carteiras')">Títulos por banco</button>
-                <button class="tab-button" id="tab-problemas" onclick="switchTab('problemas')">Problemas nos boletos</button>
+                <button class="tab-button" id="tab-loja" onclick="switchTab('loja')"><span aria-hidden="true">🏪</span> Caixa da loja</button>
+                <button class="tab-button" id="tab-carteiras" onclick="switchTab('carteiras')"><span aria-hidden="true">🏦</span> Títulos por banco</button>
+                <button class="tab-button" id="tab-problemas" onclick="switchTab('problemas')"><span aria-hidden="true">⚠️</span> Problemas nos boletos</button>
                 <button class="tab-button" id="tab-anomalias" onclick="switchTab('anomalias')">
-                    Anomalias
+                    <span aria-hidden="true">🔎</span> Anomalias
                 </button>
             </div>
         </div>
