@@ -5,7 +5,9 @@ function lj_templates($dir,$user,$action='read',$name='',$filter=array()) {
     foreach(array(dirname($dir),$dir) as $path){if(is_link($path))throw new RuntimeException('Diretório de modelos simbólico recusado.');if(!is_dir($path) && !@mkdir($path,0700) && !is_dir($path))throw new RuntimeException('Sem permissão para criar a pasta dos modelos.');}
     $path=$dir.'/'.hash('sha256',$user).'.php';$prefix="<?php http_response_code(404); exit; ?>\n";
     if(is_link($path))throw new RuntimeException('Arquivo de modelos simbólico recusado.');
-    if(!file_exists($path)){$initial=@fopen($path,'x');if($initial){fwrite($initial,$prefix.base64_encode('{}'));fclose($initial);chmod($path,0600);}}
+    if(!file_exists($path) && $action==='read')return array();
+    if(!file_exists($path)){$initial=@fopen($path,'x');if($initial){$payload=$prefix.base64_encode('{}');$written=fwrite($initial,$payload);fclose($initial);chmod($path,0600);if($written!==strlen($payload))throw new RuntimeException('Não foi possível inicializar os filtros salvos.');}else{clearstatcache(true,$path);if(!is_file($path))throw new RuntimeException('Sem permissão para gravar filtros salvos.');}}
+    clearstatcache(true,$path);
     if(!is_file($path)||stat($path)['nlink']>1)throw new RuntimeException('Arquivo de modelos inválido.');
     $fp=fopen($path,'r+');if(!$fp||!flock($fp,LOCK_EX))throw new RuntimeException('Não foi possível acessar os modelos.');
     try{

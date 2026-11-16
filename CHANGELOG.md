@@ -1,3 +1,9 @@
+# 3.7.5 — 2026-11-16
+
+- Exibe resumo dos filtros aplicados e aviso de resultado vazio antes dos totais.
+- Simplifica nomes dos filtros e modelos salvos, com datas no padrão brasileiro.
+- Consulta de filtros salvos não cria arquivos vazios; criação informa falha de gravação e atualiza cache de metadados. Preserva arquivos existentes.
+
 # 3.7.4 — 2026-11-16
 
 - Renomeia a guia para CAIXA PERSONALIZADO e explica os filtros combinados por usuário, recebimento e conta, com modelos salvos.
