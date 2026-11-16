@@ -1113,7 +1113,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 <button class="tab-button" id="tab-evolucao" onclick="switchTab('evolucao')">
                     <span aria-hidden="true">📈</span> Evolução
                 </button>
-                <button class="tab-button" id="tab-loja" onclick="switchTab('loja')"><span aria-hidden="true">🏪</span> Caixa da loja</button>
+                <button class="tab-button" id="tab-loja" onclick="switchTab('loja')"><span aria-hidden="true">🏪</span> CAIXA PERSONALIZADO</button>
                 <button class="tab-button" id="tab-carteiras" onclick="switchTab('carteiras')"><span aria-hidden="true">🏦</span> Títulos por banco</button>
                 <button class="tab-button" id="tab-problemas" onclick="switchTab('problemas')"><span aria-hidden="true">⚠️</span> Problemas nos boletos</button>
                 <button class="tab-button" id="tab-anomalias" onclick="switchTab('anomalias')">

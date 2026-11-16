@@ -1,3 +1,7 @@
+# 3.7.4 — 2026-11-16
+
+- Renomeia a guia para CAIXA PERSONALIZADO e explica os filtros combinados por usuário, recebimento e conta, com modelos salvos.
+
 # 3.7.3 — 2026-11-16
 
 - Mantém entradas, saídas, recebimentos e resultado completos do período nos cards, independentemente dos filtros visuais da tabela.

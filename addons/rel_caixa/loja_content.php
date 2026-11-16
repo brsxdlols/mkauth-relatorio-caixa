@@ -31,7 +31,7 @@ try{
 }catch(Throwable $e){$lo_error=$e->getMessage();}
 $lo_summary=lj_summary($lo_rows);$lo_page=max(1,isset($_GET['lo_pagina'])?(int)$_GET['lo_pagina']:1);$lo_pages=max(1,(int)ceil(count($lo_rows)/50));$lo_page=min($lo_page,$lo_pages);$lo_display=array_slice($lo_rows,($lo_page-1)*50,50);
 ?>
-<div class="bt-heading"><div><h2>Caixa da loja</h2><p>Separe os recebimentos por forma, conta e atendente. Os lançamentos continuam no caixa principal.</p></div><span class="rc-app-badge">Visão de conferência</span></div>
+<div class="bt-heading"><div><h2>CAIXA PERSONALIZADO</h2><p>Filtre por um ou mais usuários, formas de recebimento e contas. Combine as opções e salve como modelo para consultar novamente. Os lançamentos continuam no caixa principal.</p></div><span class="rc-app-badge">Visão de conferência</span></div>
 <?php if($lo_error): ?><p class="bt-warning" role="alert"><?php echo bt_h($lo_error); ?></p><?php endif; ?>
 <?php if($lo_message): ?><p class="lo-message" role="status"><?php echo bt_h($lo_message); ?></p><?php endif; ?>
 <?php foreach($lo_warnings as $warning): ?><p class="bt-warning"><?php echo bt_h($warning); ?></p><?php endforeach; ?>
