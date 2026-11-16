@@ -1,3 +1,9 @@
+# 3.7.3 — 2026-11-16
+
+- Mantém entradas, saídas, recebimentos e resultado completos do período nos cards, independentemente dos filtros visuais da tabela.
+- Exibe entradas e saídas juntas ao abrir a tela; ocultar tarifas não altera o resultado do caixa.
+- Esclarece o escopo da tabela, CSV e impressão.
+
 # 3.7.2 — 2026-11-16
 
 - Retoma o layout clássico compacto com faixa superior, abas, cards e cabeçalho de tabela em azul do datacenter.

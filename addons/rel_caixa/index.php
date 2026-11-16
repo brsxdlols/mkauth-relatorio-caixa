@@ -976,7 +976,6 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const searchInput = document.getElementById('search');
         const term = normalizeSearch(searchInput ? searchInput.value.trim() : '');
 
-        let incoming = 0, outgoing = 0, receipts = 0;
         const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row');
         const feeButton = document.getElementById('toggleButton');
         if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Ocultar tarifas' : 'Mostrar tarifas'); }
@@ -987,10 +986,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             const feeHidden = row.classList.contains('tarifa-row') && !tariffsVisible;
             row.classList.toggle('hidden', feeHidden);
             row.classList.toggle('filter-hidden', !(matchesText && matchesMovement));
-            if (matchesText && matchesMovement && !feeHidden) { incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0); if (Number(row.dataset.incoming || 0) > 0) receipts++; }
         });
-        const money = value => 'R$ ' + (value / 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        [['boletos', receipts], ['entradas', money(incoming)], ['saidas', money(outgoing)], ['saldo', money(incoming - outgoing)]].forEach(item => { const value = document.querySelector('#content-financeiro .stat-item.' + item[0] + ' .stat-value'); if (value) value.textContent = item[1]; });
+        // Os cards preservam os totais calculados no servidor para o período.
+        // Filtros de visualização afetam somente as linhas da tabela.
     }
 
     function setMovementFilter(filter, card) {
@@ -1232,7 +1230,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                         </div>
                     </div>
 
-<p class="bt-note">Cards, CSV e impressão consideram as linhas visíveis. Ocultar tarifas retira essas saídas dos totais dos cards. A conferência abaixo mantém a visão completa do período.</p>
+<p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV exporta as linhas visíveis; a impressão mantém os totais do período e a tabela filtrada.</p>
                     <?php include('conferencia_content.php'); ?>
                     <div class="rc-tools"><div><h2>Lançamentos</h2><p>Consulte os detalhes de cada movimentação.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
