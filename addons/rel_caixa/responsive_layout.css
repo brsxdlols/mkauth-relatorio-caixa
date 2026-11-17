@@ -1,0 +1,34 @@
+/* Scope width corrections to the addon; never hide overflowing native content. */
+@media screen {
+    #rc-caixa.container { width: calc(100% - 24px); max-width: calc(100% - 24px); min-width: 0; }
+    #rc-caixa .tab-content, #rc-caixa .content-wrapper, #rc-caixa .rc-conference, #rc-caixa .table-wrapper, #rc-caixa .stats-bar, #rc-caixa .stat-item, #rc-caixa .stat-content { min-width: 0; max-width: 100%; }
+    #rc-caixa .table-wrapper { display: block; width: 100%; overflow-x: auto; }
+    #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(5,minmax(0,1fr)); }
+    #rc-caixa .stat-item { min-width: 0; }
+    #rc-caixa .stat-label { overflow-wrap: anywhere; }
+    #rc-caixa .stat-value { white-space: nowrap; font-size: clamp(15px,1.3vw,19px); }
+    #rc-caixa .rc-tools, #rc-caixa .rc-status-line { flex-wrap: wrap; }
+    #rc-caixa .rc-page-header > div { min-width: 0; }
+    #rc-caixa .finance-table { min-width: 0; width: 100%; table-layout: fixed; }
+    #rc-caixa .finance-table th, #rc-caixa .finance-table td { min-width: 0; max-width: none; overflow-wrap: anywhere; }
+    #rc-caixa .finance-table td:nth-child(3) { white-space: normal; }
+    #rc-caixa .finance-table th:nth-child(1) { width: 21%; }
+    #rc-caixa .finance-table th:nth-child(2) { width: 9%; }
+    #rc-caixa .finance-table th:nth-child(3) { width: 12%; }
+    #rc-caixa .finance-table th:nth-child(4) { width: 6%; }
+    #rc-caixa .finance-table th:nth-child(5) { width: 22%; }
+    #rc-caixa .finance-table th:nth-child(6), #rc-caixa .finance-table th:nth-child(7) { width: 7%; }
+    #rc-caixa .finance-table th:nth-child(8), #rc-caixa .finance-table th:nth-child(10) { width: 6%; }
+    #rc-caixa .finance-table th:nth-child(9) { width: 4%; }
+    #rc-caixa .finance-table tfoot th { width: auto; }
+}
+@media screen and (max-width:1199px) and (min-width:901px) {
+    #rc-caixa .finance-table th, #rc-caixa .finance-table td { padding: 7px 5px; font-size: 12px; }
+    #rc-caixa .finance-table .badge { padding: 3px 4px; font-size: 11px; }
+    #rc-caixa .stat-item { padding: 9px 8px; gap: 5px; }
+}
+@media screen and (max-width:900px) {
+    #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(2,minmax(0,1fr)); }
+    #rc-caixa .finance-table { min-width: 1100px; }
+    #rc-caixa .stat-value { font-size: 17px; }
+}

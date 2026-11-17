@@ -948,6 +948,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     }
 
 </style>
+<link href="responsive_layout.css?v=<?php echo rawurlencode($manifestVersion); ?>" rel="stylesheet" type="text/css" />
 
 </head>
 

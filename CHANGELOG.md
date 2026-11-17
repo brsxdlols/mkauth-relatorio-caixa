@@ -1,3 +1,8 @@
+# 3.7.12 — 2026-11-17
+
+- Mantém os cinco cards em uma linha no desktop e remove larguras mínimas que expandiam a página.
+- Ajusta colunas e quebra de nomes da tabela ao desktop; em telas pequenas a rolagem fica apenas dentro da tabela.
+
 # 3.7.11 — 2026-11-17
 
 - Centraliza CAIXA HOJE e CONFERÊNCIA COMPLETA em cards acima dos filtros. O segundo abre e destaca resumos e alertas do período inteiro.
