@@ -48,3 +48,8 @@
 #rc-print-dialog .rc-print-cancel { padding: 9px 16px; background: white; color: #315776; border: 1px solid #a5bed3; border-radius: 5px; cursor: pointer; }
 
 @media screen and (max-width:1199px) { #rc-caixa .finance-table thead th { font-size: 11px; padding: 8px 4px; } }
+
+#rc-print-dialog .rc-preview-close { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 8px 16px; border: 1px solid #b2cfee; border-radius: 999px; background: #edf6ff; color: #075a9e; font: 600 13px 'Segoe UI',Arial,sans-serif; cursor: pointer; box-shadow: 0 2px 5px #163d6b0a; transition: background .15s,border-color .15s; }
+#rc-print-dialog .rc-preview-close span { font-size: 23px; line-height: 16px; font-weight: 400; }
+#rc-print-dialog .rc-preview-close:hover { background: #d8ebff; border-color: #1685d1; }
+#rc-print-dialog .rc-preview-close:focus-visible { outline: 2px solid #1685d1; outline-offset: 3px; }

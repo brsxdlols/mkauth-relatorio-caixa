@@ -1165,6 +1165,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         <?php include('config.php'); ?>
 
         <?php if ($acesso_permitido) : ?>
+        <?php require_once __DIR__.'/provedor_report.php'; ?>
+        <script type="application/json" id="rc-provider-data"><?php echo json_encode(rc_report_provider($link),JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_INVALID_UTF8_SUBSTITUTE); ?></script>
 
             <!-- TAB CONTENT: FINANCEIRO -->
             <div id="content-financeiro" class="tab-content active">

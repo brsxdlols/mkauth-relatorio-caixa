@@ -1,3 +1,8 @@
+# 3.7.14 — 2026-11-17
+
+- Relatórios simples e detalhados começam com nome, CNPJ e logo disponível do provedor, lidos do MK-AUTH.
+- Botão Fechar da prévia com ícone, bordas arredondadas e estados de interação em azul.
+
 # 3.7.13 — 2026-11-17
 
 - Corrige sobreposição dos cabeçalhos da tabela com quebra e distribuição das colunas.
