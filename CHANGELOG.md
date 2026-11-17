@@ -1,3 +1,11 @@
+# 3.7.11 — 2026-11-17
+
+- Centraliza CAIXA HOJE e CONFERÊNCIA COMPLETA em cards acima dos filtros. O segundo abre e destaca resumos e alertas do período inteiro.
+
+- Corrige contraste e alinhamento dos totais da tabela.
+- Impressão com escolha Simples ou Detalhado e prévia independente do CSS nativo, evitando página em branco.
+- Detalhado inclui resumos por conta, recebimento, motivo e usuário. Ambos respeitam filtros aplicados e exibem entradas, saídas, acréscimos e resultado sem duplicar valores.
+
 # 3.7.10 — 2026-11-17
 
 - Atalho CAIXA HOJE abre a data atual, com todos os recebimentos e sem filtros anteriores.

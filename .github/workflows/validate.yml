@@ -16,3 +16,8 @@ jobs:
           extensions: mysqli
       - name: Validate addon and safe installer
         run: sh scripts/validate.sh
+
+      - name: Validate cash filters and report rendering
+        run: |
+          node tests/finance_filters.cjs
+          node tests/relatorio_print.cjs

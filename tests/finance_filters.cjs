@@ -5,7 +5,7 @@ function row(movement,fee) { const classes = new Set(fee ? ['tarifa-row'] : []);
 const entry=row('entrada',false), expense=row('saida',true), rows=[entry,expense];
 const footer={'rc-footer-incoming':{},'rc-footer-extra':{},'rc-footer-outgoing':{}};
 const button={}, search={value:''};
-const context={document:{getElementById:id=>id==='search'?search:(footer[id]||button),querySelectorAll:sel=>sel.includes('[data-search]')?rows:sel.includes('tarifa-row')?[expense]:[],querySelector:()=>{throw Error('Filtros não podem reescrever os totais do caixa');}}};
+const context={window:{},document:{getElementById:id=>id==='search'?search:(footer[id]||button),querySelectorAll:sel=>sel.includes('[data-search]')?rows:sel.includes('tarifa-row')?[expense]:[],querySelector:()=>{throw Error('Filtros não podem reescrever os totais do caixa');}}};
 vm.createContext(context);vm.runInContext(fragment,context);
 vm.runInContext('applyTableFilters()',context); assert(rows.every(r=>!r.classes.has('hidden')&&!r.classes.has('filter-hidden')));
 vm.runInContext("setMovementFilter('entrada', null)",context);assert(!entry.classes.has('filter-hidden')&&expense.classes.has('filter-hidden'));

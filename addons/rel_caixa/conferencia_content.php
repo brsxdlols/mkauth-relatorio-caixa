@@ -71,7 +71,7 @@ try {
 ?>
 <section class="rc-conference">
     <div class="rc-status-line"><span class="rc-status-dot"></span><strong><?php echo $rc_error ? "Conferência indisponível" : (count($rc_alerts) ? count($rc_alerts) . " itens para revisar" : "Nenhum alerta encontrado"); ?></strong><span><?php echo rc_escape($rc_label); ?></span><span class="rc-scope">Todos os clientes do período</span></div>
-    <details class="rc-analysis"><summary>Ver conferência e resumos <span>Por dia, usuário e pagamento</span></summary>
+    <details class="rc-analysis" id="rc-full-conference" ontoggle="var shortcut=document.getElementById('rc-conference-shortcut');if(shortcut)shortcut.setAttribute('aria-expanded',this.open?'true':'false');"><summary>Conferência completa <span>Por dia, usuário e pagamento</span></summary>
 
     <p><?php echo rc_escape($rc_label); ?> · Resumos e alertas consideram todos os clientes do período.</p>
     <p>Resultado do período = entradas − saídas. Não inclui saldo anterior nem representa saldo bancário.</p>

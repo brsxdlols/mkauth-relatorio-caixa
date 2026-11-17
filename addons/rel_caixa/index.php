@@ -31,14 +31,16 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
-    #rc-caixa .rc-today-card { margin-left: auto; display: flex; flex-direction: column; gap: 3px; background: #e9f4ff; border: 1px solid #1685d1; border-radius: 6px; padding: 9px 14px; color: #075a9e; text-decoration: none; }
-    #rc-caixa .rc-today-card strong { font-size: 13px; }
-    #rc-caixa .rc-today-card span { font-size: 11px; }
-    #rc-caixa .rc-today-card:hover, #rc-caixa .rc-today-card:focus-visible { background: #d7ebff; outline: 2px solid #1685d1; outline-offset: 2px; }
-    @media(max-width:700px) { #rc-caixa .rc-today-card { margin-left: 0; width: 100%; } }
-
-    #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(4,minmax(0,1fr)) minmax(130px,.85fr); }
-    #rc-caixa .finance-table tfoot th, #rc-caixa .finance-table tfoot td { background: #edf5ff; border-top: 2px solid #1285cf; font-weight: 700; padding: 12px 10px; white-space: nowrap; }
+    #rc-caixa .rc-shortcuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; max-width: 760px; margin: 4px auto 18px; }
+    #rc-caixa .rc-shortcut-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 76px; padding: 14px; border: 1px solid #9ec9ed; border-radius: 7px; background: #edf6ff; color: #075a9e; text-decoration: none; text-align: center; cursor: pointer; font-family: inherit; }
+    #rc-caixa .rc-shortcut-card strong { font-size: 14px; }
+    #rc-caixa .rc-shortcut-card span { font-size: 12px; color: #315d80; }
+    #rc-caixa .rc-shortcut-card:hover, #rc-caixa .rc-shortcut-card:focus-visible { background: #dceeff; outline: 2px solid #1685d1; outline-offset: 2px; }
+    #rc-caixa .rc-conference { scroll-margin-top: calc(var(--rc-navbar-height, 3.25rem) + 16px); }
+    @media(max-width:600px) { #rc-caixa .rc-shortcuts { grid-template-columns: 1fr; } }
+    @media print { #rc-caixa .rc-shortcuts { display: none !important; } }
+    #rc-caixa .finance-table tfoot th, #rc-caixa .finance-table tfoot td { background: #edf5ff; background-image: none; color: #153b60; text-align: left; border-top: 2px solid #1285cf; font-weight: 700; padding: 12px 10px; white-space: nowrap; }
+    #rc-caixa .finance-table tfoot td, #rc-caixa .finance-table tbody td:nth-child(6), #rc-caixa .finance-table tbody td:nth-child(7), #rc-caixa .finance-table tbody td:nth-child(8) { text-align: right; font-variant-numeric: tabular-nums; }
     #rc-caixa .finance-table tfoot #rc-footer-extra { color: #087f4f; }
     #rc-caixa .finance-table tfoot #rc-footer-outgoing { color: #dc2626; }
     #rc-caixa .rc-extras-card .stat-value { font-size: 17px; color: #087f4f; }
@@ -950,6 +952,15 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 </head>
 
 <script>
+    function rcOpenConference() {
+        const details = document.getElementById('rc-full-conference');
+        if (!details) return;
+        details.open = true;
+        details.querySelectorAll('details').forEach(function(item) { item.open = true; });
+        document.getElementById('rc-conference-shortcut').setAttribute('aria-expanded', 'true');
+        details.closest('.rc-conference').scrollIntoView({behavior: 'smooth', block: 'start'});
+        details.querySelector('summary').focus({preventScroll: true});
+    }
     function rcExport() {
         const table = document.querySelector('.finance-table');
         const rows = table ? Array.from(table.querySelectorAll('tbody tr')).filter(row => !row.classList.contains('hidden') && !row.classList.contains('filter-hidden')) : [];
@@ -1033,6 +1044,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         applyTableFilters();
     }
 
+    window.rcPrintFilterState = function () { return {movement: movementFilter, fees: tariffsVisible}; };
     window.addEventListener('beforeprint', function() { document.querySelectorAll('.rc-conference details').forEach(function(d) { d.dataset.rcOpen = d.open ? '1' : '0'; d.open = true; }); });
     window.addEventListener('afterprint', function() { document.querySelectorAll('.rc-conference details').forEach(function(d) { d.open = d.dataset.rcOpen === '1'; }); });
 
@@ -1120,6 +1132,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <body>
     <div id="rc-native-top"><?php include('../../topo.php'); ?></div>
     <script src="navbar_layout.js"></script>
+    <script src="relatorio_print.js?v=<?php echo rawurlencode($manifestVersion); ?>"></script>
 
     <div class="container" id="rc-caixa">
         <header class="rc-page-header"><div><span class="rc-eyebrow">ADDON</span><h1>Relatório de Caixa</h1></div><span class="rc-app-badge">v<?php echo htmlspecialchars($manifestVersion, ENT_QUOTES, 'UTF-8'); ?></span></header>
@@ -1155,6 +1168,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             <!-- TAB CONTENT: FINANCEIRO -->
             <div id="content-financeiro" class="tab-content active">
                 <div class="content-wrapper">
+                    <div class="rc-shortcuts" aria-label="Acessos rápidos do caixa">
+                        <a class="rc-shortcut-card" href="?tab=financeiro&amp;search=&amp;data_inicial=<?php echo date('Y-m-d'); ?>&amp;data_final=<?php echo date('Y-m-d'); ?>" title="Abrir o caixa de hoje e limpar todos os filtros"><strong>CAIXA HOJE</strong><span><?php echo date('d/m/Y'); ?> · Todos os recebimentos</span></a>
+                        <button type="button" class="rc-shortcut-card" id="rc-conference-shortcut" aria-controls="rc-full-conference" aria-expanded="false" onclick="rcOpenConference()"><strong>CONFERÊNCIA COMPLETA</strong><span>Resumos e alertas de todos os clientes do período</span></button>
+                    </div>
                     <div class="search-form">
                         <form id="searchForm" method="GET">
                             <div class="form-group">
@@ -1175,7 +1192,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                             <button type="submit" class="btn btn-primary">Aplicar período</button>
                             <button type="button" onclick="clearSearch()" class="btn btn-secondary">Limpar</button>
                             <button type="button" id="toggleButton" onclick="toggleTarifaRows()" class="btn btn-secondary" aria-describedby="rc-fees-help" title="Mostra ou esconde taxas de boleto na tabela. Os cards mantêm o caixa completo.">Esconder taxas na tabela</button>
-                            <a class="rc-today-card" href="?tab=financeiro&amp;search=&amp;data_inicial=<?php echo date('Y-m-d'); ?>&amp;data_final=<?php echo date('Y-m-d'); ?>" title="Abrir o caixa de hoje e limpar todos os filtros"><strong>CAIXA HOJE</strong><span><?php echo date('d/m/Y'); ?> · Todos os recebimentos</span></a>
+
                         </form>
                         <p id="rc-fees-help" class="bt-note" style="margin:8px 0 0">Taxas de boleto: o botão altera apenas a tabela, seus totais de baixo, CSV e impressão. Os cards do período sempre incluem as taxas.</p>
                     </div>
@@ -1267,11 +1284,11 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <p class="bt-note">Acréscimos pagos = diferença positiva entre o valor pago e o valor original do título (juros e multa juntos), já incluída nas entradas. “Não identificado” indica recebimento sem vínculo único compatível com o pagamento do título. <?php echo (int)$rc_extras['unknown']; ?> recebimento(s) não identificado(s). A classificação usa os valores atuais do título.</p>
 <p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV exporta as linhas visíveis; a impressão mantém os totais do período e a tabela filtrada.</p>
                     <?php include('conferencia_content.php'); ?>
-                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
+                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="rcPrintChoose('financeiro')">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">
-                            <table class="finance-table">
+                            <table class="finance-table" data-period-start="<?php echo bt_h($rc_start->format('Y-m-d')); ?>" data-period-end="<?php echo bt_h($rc_end->format('Y-m-d')); ?>">
                                 <thead>
                                     <tr>
                                         <th>Cliente</th>
@@ -1296,8 +1313,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $matches = array();
                                         preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
                                         $id = isset($matches[1]) ? $matches[1] : '--';
-                                        $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente FROM sis_lanc l
+                                        $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente, l.formapag, l.numconta, b.nome AS conta_nome FROM sis_lanc l
                                             JOIN sis_cliente c ON l.login = c.login
+                                            LEFT JOIN sis_boleto b ON b.id = l.numconta
                                             WHERE l.id = '$id'";
                                         $cliente_result = mysqli_query($link, $cliente_query);
                                         $cliente_row = $cliente_result ? mysqli_fetch_assoc($cliente_result) : null;
@@ -1307,7 +1325,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
                                         $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'] . ' ' . $row['_fee_history'];
                                         ?>
-                                        <tr data-fee="<?php echo (int)$row['_fee_amount']; ?>" data-extra="<?php echo (int)$row['_extra']; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <tr data-account="<?php echo bt_h(!empty($cliente_row['conta_nome']) ? $cliente_row['conta_nome'].' (#'.$cliente_row['numconta'].')' : 'Sem conta identificada'); ?>" data-method="<?php echo bt_h(!empty($cliente_row['formapag']) ? $cliente_row['formapag'] : 'Não informado'); ?>" data-fee="<?php echo (int)$row['_fee_amount']; ?>" data-extra="<?php echo (int)$row['_extra']; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
 

@@ -1,0 +1,55 @@
+/* Standalone report: no native MK-AUTH styles or financial writes. */
+(function (global) {
+    'use strict';
+    function esc(value) { return String(value == null ? '' : value).replace(/[&<>"']/g, function(c) { return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+    function money(value) { return 'R$ ' + (value / 100).toLocaleString('pt-BR', {minimumFractionDigits:2,maximumFractionDigits:2}); }
+    function date(value) { return /^\d{4}-\d{2}-\d{2}$/.test(value) ? value.slice(8,10)+'/'+value.slice(5,7)+'/'+value.slice(0,4) : value; }
+    function totals(rows) { return rows.reduce(function(t,r) { t.incoming+=r.incoming; t.outgoing+=r.outgoing; t.extra+=r.extra; return t; }, {incoming:0,outgoing:0,extra:0}); }
+    function cells(values,tag) { return values.map(function(v){return '<'+tag+'>'+esc(v)+'</'+tag+'>';}).join(''); }
+    function summary(rows,key) {
+        var groups=Object.create(null);
+        function add(name,incoming,outgoing) { if(!groups[name])groups[name]={incoming:0,outgoing:0};groups[name].incoming+=incoming;groups[name].outgoing+=outgoing; }
+        rows.forEach(function(r) {
+            if(key==='reason') { if(r.incoming)add(r.title && r.title!=='--' ? 'Recebimento de título' : (r.history||'Outras entradas'),r.incoming,0); if(r.fee)add('Taxa de boleto',0,r.fee); if(r.outgoing-r.fee)add(r.history||'Outras saídas',0,r.outgoing-r.fee); }
+            else add(r[key]||'Não identificado',r.incoming,r.outgoing);
+        });
+        return Object.keys(groups).sort().map(function(name){var v=groups[name];return '<tr>'+cells([name,money(v.incoming),money(v.outgoing),money(v.incoming-v.outgoing)],'td')+'</tr>';}).join('');
+    }
+    function build(data,detailed) {
+        var rows=data.rows,t=totals(rows),heading=detailed?'Relatório detalhado de caixa':'Relatório simples de caixa';
+        var html='<!doctype html><html lang="pt-BR"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(heading)+'</title><style>'+
+        '@page{size:A4 '+(detailed?'landscape':'portrait')+';margin:12mm}*{box-sizing:border-box}body{margin:24px;color:#172b43;background:#fff;font:12px Arial,sans-serif}h1{font-size:23px;margin:0 0 7px;color:#075a9e}h2{font-size:16px;margin:22px 0 8px}p{line-height:1.5;margin:6px 0}header{border-bottom:2px solid #1685d1;padding-bottom:12px}table{width:100%;border-collapse:collapse;margin:12px 0;table-layout:auto}th,td{padding:7px;border:1px solid #d3dfeb;text-align:left;vertical-align:top;overflow-wrap:anywhere}th{background:#e9f2fb;color:#123c63}section td:not(:first-child),section th:not(:first-child){text-align:right;white-space:nowrap}thead{display:table-header-group}tfoot{display:table-row-group}tr{break-inside:avoid}tbody tr:nth-child(even){background:#f8fafc}.number{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.final{border:1px solid #b6cde1;padding:12px;break-inside:avoid;background:#f1f7fc}.final strong{display:inline-block;margin-right:24px}.note{font-size:11px;color:#485e74}.tools{display:flex;gap:10px;align-items:center;margin:0 0 20px}button{padding:10px 16px;background:#076eb9;color:white;border:0;border-radius:4px;cursor:pointer}@media print{body{margin:0;font-size:'+(detailed?'9':'10')+'px}.tools{display:none}h1{font-size:20px}th,td{padding:5px}a{color:inherit;text-decoration:none}}' +
+        '</style><body><div class="tools"><button onclick="window.print()">Imprimir / Salvar PDF</button><span>Confira o relatório antes de imprimir.</span></div><header><h1>'+esc(heading)+'</h1><p><strong>Período: '+esc(date(data.start)+' a '+date(data.end))+'</strong></p><p>'+esc(data.scope)+'</p><p class="note">Gerado em '+esc(data.generated)+' · '+rows.length+' linha(s). Conta e forma de recebimento correspondem ao cadastro atual do título.</p></header>';
+        if(detailed) [['account','Por conta bancária'],['method','Por forma de recebimento'],['reason','Por motivo'],['user','Por usuário']].forEach(function(item){html+='<section><h2>'+item[1]+'</h2><table><thead><tr>'+cells(['Descrição','Entrada','Saída','Resultado'],'th')+'</tr></thead><tbody>'+summary(rows,item[0])+'</tbody></table></section>';});
+        html+='<h2>Lançamentos do período filtrado</h2><table><thead><tr>'+cells(detailed?['Cliente / título','Data','Conta / recebimento','Usuário','Histórico','Entrada','Acréscimos','Saída']:['Cliente','Título','Data','Entrada','Acréscimos','Saída'],'th')+'</tr></thead><tbody>';
+        rows.forEach(function(r){var text=detailed?[r.client+' / #'+r.title,r.date,r.account+' / '+r.method,r.user,r.history]:[r.client,r.title,r.date];html+='<tr>'+cells(text,'td')+'<td class="number">'+money(r.incoming)+'</td><td class="number">'+(r.extraKnown?money(r.extra):'Não identificado')+'</td><td class="number">'+money(r.outgoing)+'</td></tr>';});
+        if(!rows.length)html+='<tr><td colspan="'+(detailed?8:6)+'">Nenhum lançamento atende aos filtros.</td></tr>';
+        html+='</tbody><tfoot><tr>'+ '<th colspan="'+(detailed?5:3)+'">Totais do relatório</th><th class="number">'+money(t.incoming)+'</th><th class="number">'+money(t.extra)+'</th><th class="number">'+money(t.outgoing)+'</th></tr></tfoot></table><div class="final"><strong>Entradas: '+money(t.incoming)+'</strong><strong>Saídas: '+money(t.outgoing)+'</strong><strong>Resultado: '+money(t.incoming-t.outgoing)+'</strong><p>Acréscimos identificados: '+money(t.extra)+' — já incluídos nas entradas.</p></div><p class="note">Resultado = entradas − saídas, sem saldo anterior. Este relatório respeita os filtros descritos acima; pode diferir dos cards que mostram o período completo. Acréscimos não identificados não são tratados como zero confirmado.</p></body></html>';
+        return html;
+    }
+    function collect(tab) {
+        var data={rows:[],generated:new Date().toLocaleString('pt-BR')};
+        if(tab==='loja') {
+            var form=document.getElementById('lo-filter-form');
+            var exported=document.getElementById('lo-export-data');data.start=exported.dataset.periodStart;data.end=exported.dataset.periodEnd;
+            var applied=Array.from(document.querySelectorAll('#content-loja .lo-message')).find(function(el){return el.textContent.indexOf('Filtros aplicados:')>=0;});data.scope='Caixa personalizado · '+(applied?applied.textContent.trim():'Filtros aplicados na consulta');
+            JSON.parse(document.getElementById('lo-export-data').textContent).slice(1,-1).forEach(function(r){var cents=function(v){return Math.round(Number(String(v).replace(',','.'))*100)||0;};data.rows.push({client:r[1],title:r[2],date:r[0],user:r[3],method:r[4],account:r[5],history:r[6],incoming:cents(r[7]),outgoing:cents(r[8]),extra:0,extraKnown:false,fee:/tarif|taxa/i.test(r[6])?cents(r[8]):0});});
+        } else {
+            var table=document.querySelector('.finance-table');data.start=table.dataset.periodStart;data.end=table.dataset.periodEnd;
+            var state=global.rcPrintFilterState(),names={todos:'Todos os movimentos',entrada:'Recebimentos',saida:'Linhas com saídas',acrescimos:'Recebimentos com acréscimos'};
+            data.scope=(names[state.movement]||state.movement)+' · '+(state.fees?'Inclui taxas de boleto':'Taxas ocultas, excluídas deste relatório')+' · Busca: '+(document.getElementById('search').value||'todos os clientes');
+            document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row){if(row.classList.contains('hidden')||row.classList.contains('filter-hidden'))return;var c=Array.from(row.cells).map(function(cell){return cell.textContent.trim();}),fee=Number(row.dataset.fee||0),out=Number(row.dataset.outgoing||0);data.rows.push({client:c[0],title:c[8],date:c[2],user:c[3],history:c[4],account:row.dataset.account||'Não identificada',method:row.dataset.method||'Não informada',incoming:Number(row.dataset.incoming||0),outgoing:out-(state.fees?0:fee),extra:Number(row.dataset.extra||0),extraKnown:c[6].indexOf('Não identificado')<0,fee:state.fees?(fee|| (row.classList.contains('tarifa-row')?out:0)):0});});
+        }
+        return data;
+    }
+    function choose(tab) {
+        var existing=document.getElementById('rc-print-dialog');if(existing)existing.remove();
+        var dialog=document.createElement('dialog');dialog.id='rc-print-dialog';dialog.style.cssText='padding:24px;border:1px solid #b7cce0;border-radius:10px;max-width:520px;width:calc(100% - 24px);color:#193b5a;background:white';
+        dialog.innerHTML='<h2 style="color:#075a9e;margin-bottom:12px">Como deseja o relatório?</h2><p style="margin-bottom:16px">Será usado o período filtrado e as linhas exibidas, incluindo a escolha de mostrar ou esconder taxas.</p><button type="button" data-mode="simple" style="padding:12px;margin:4px">Simples — clientes, títulos e valores</button><button type="button" data-mode="detailed" style="padding:12px;margin:4px">Detalhado — contas, recebimentos, motivos e usuários</button><button type="button" data-mode="cancel" style="padding:8px;margin:8px">Cancelar</button><p role="alert"></p>';
+        document.body.appendChild(dialog);
+        dialog.addEventListener('click',function(event){var mode=event.target.dataset.mode;if(!mode)return;if(mode==='cancel'){dialog.close();return;}var report;try{report=build(collect(tab),mode==='detailed');}catch(error){dialog.querySelector('[role=alert]').textContent='Não foi possível preparar o relatório. Atualize a página e tente novamente.';return;}dialog.style.cssText='padding:12px;border:1px solid #b7cce0;border-radius:8px;width:96vw;max-width:none;height:92vh;max-height:96vh;background:white;color:#193b5a';dialog.innerHTML='<div style="display:flex;justify-content:space-between;align-items:center;height:40px"><strong>Prévia do relatório</strong><button type="button" data-mode="cancel" style="padding:8px;color:#193b5a;background:#edf5ff;border:1px solid #b7cce0">Fechar prévia</button></div>';var frame=document.createElement('iframe');frame.title='Relatório de caixa para impressão';frame.style.cssText='width:100%;height:calc(100% - 44px);border:1px solid #d3dfeb;background:white';frame.srcdoc=report;dialog.appendChild(frame);});
+        dialog.showModal();
+    }
+    if(typeof module!=='undefined'&&module.exports)module.exports={build:build,totals:totals};
+    if(global)global.rcPrintChoose=choose;
+}(typeof window!=='undefined'?window:null));
