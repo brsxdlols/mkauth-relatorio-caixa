@@ -1,3 +1,8 @@
+# 3.7.6 — 2026-11-17
+
+- Compensa a altura do menu fixo uma única vez no html do Caixa, eliminando o espaçador nativo antigo apenas nesta página.
+- Mantém 12px de respiro antes do cabeçalho e acompanha alterações do menu e largura da tela. Sem alterar CSS global ou arquivos nativos.
+
 # 3.7.5 — 2026-11-16
 
 - Exibe resumo dos filtros aplicados e aviso de resultado vazio antes dos totais.

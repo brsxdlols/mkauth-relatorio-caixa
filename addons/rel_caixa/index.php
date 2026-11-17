@@ -14,7 +14,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 ?>
 
 <!DOCTYPE html>
-<html lang="pt-BR" class="has-navbar-fixed-top">
+<html lang="pt-BR" id="rc-caixa-page" class="has-navbar-fixed-top">
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta charset="iso-8859-1">
@@ -28,6 +28,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <script src="../../scripts/mk-auth.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
+<link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
     :root {
         --primary: #6e7aff;
@@ -1093,7 +1094,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 </script>
 
 <body>
-    <?php include('../../topo.php'); ?>
+    <div id="rc-native-top"><?php include('../../topo.php'); ?></div>
+    <script src="navbar_layout.js"></script>
 
     <div class="container" id="rc-caixa">
         <header class="rc-page-header"><div><span class="rc-eyebrow">ADDON</span><h1>Relatório de Caixa</h1></div><span class="rc-app-badge">v<?php echo htmlspecialchars($manifestVersion, ENT_QUOTES, 'UTF-8'); ?></span></header>

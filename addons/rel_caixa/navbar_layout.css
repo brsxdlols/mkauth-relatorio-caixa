@@ -1,0 +1,15 @@
+/* Local to rel_caixa: reserve the fixed navbar height exactly once. */
+@media screen {
+    html#rc-caixa-page.has-navbar-fixed-top {
+        padding-top: var(--rc-navbar-height, 3.25rem) !important;
+    }
+    html#rc-caixa-page > body { padding-top: 0 !important; }
+    #rc-caixa-page #sistema-corpo1 { display: none !important; height: 0 !important; }
+    #rc-caixa-page #sistema-corpo2 { margin-top: 0 !important; padding-top: 12px !important; }
+    /* Breathing room for the provider header, not a second navbar spacer. */
+    #rc-caixa-page #rc-native-top { padding-top: 0; }
+}
+@media print {
+    html#rc-caixa-page.has-navbar-fixed-top { padding-top: 0 !important; }
+    #rc-caixa-page #rc-native-top { display: none !important; }
+}
