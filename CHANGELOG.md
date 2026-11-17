@@ -1,3 +1,8 @@
+# 3.7.9 — 2026-11-17
+
+- Totais de entradas, acréscimos e saídas no rodapé da tabela, respeitando busca, cards e visibilidade das tarifas.
+- Descrição ao passar o mouse nos acréscimos pagos, esclarecendo juros e multa já incluídos na entrada.
+
 # 3.7.8 — 2026-11-17
 
 - Une recebimento e taxa de boleto em uma linha quando o par de título, data e usuário é único; preserva lançamentos originais e mostra a descrição da taxa ao passar o mouse.

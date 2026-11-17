@@ -32,6 +32,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
     #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(4,minmax(0,1fr)) minmax(130px,.85fr); }
+    #rc-caixa .finance-table tfoot th, #rc-caixa .finance-table tfoot td { background: #edf5ff; border-top: 2px solid #1285cf; font-weight: 700; padding: 12px 10px; white-space: nowrap; }
+    #rc-caixa .finance-table tfoot #rc-footer-extra { color: #087f4f; }
+    #rc-caixa .finance-table tfoot #rc-footer-outgoing { color: #dc2626; }
     #rc-caixa .rc-extras-card .stat-value { font-size: 17px; color: #087f4f; }
     #rc-caixa .rc-extra-paid { color: #087f4f; background: #d1fae5; font-weight: 600; border-radius: 4px; padding: 3px 6px; display: inline-block; }
     @media(max-width:900px) { #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
@@ -986,6 +989,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row, #financeTableBody tr[data-fee]:not([data-fee="0"])');
         const feeButton = document.getElementById('toggleButton');
         if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Ocultar tarifas' : 'Mostrar tarifas'); }
+        let footerIncoming = 0, footerOutgoing = 0, footerExtras = 0;
         document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row) {
             const matchesText = !term || normalizeSearch(row.dataset.search).indexOf(term) !== -1;
             const movement = row.dataset.movement || 'outro';
@@ -994,7 +998,14 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             row.classList.toggle('hidden', feeHidden);
             row.querySelectorAll('.rc-grouped-fee').forEach(function(value) { value.classList.toggle('hidden', !tariffsVisible); });
             row.classList.toggle('filter-hidden', !(matchesText && matchesMovement));
+            if (matchesText && matchesMovement && !feeHidden) {
+                footerIncoming += Number(row.dataset.incoming || 0);
+                footerOutgoing += Number(row.dataset.outgoing || 0) - (tariffsVisible ? 0 : Number(row.dataset.fee || 0));
+                footerExtras += Number(row.dataset.extra || 0);
+            }
         });
+        const footerMoney = value => 'R$ ' + (value / 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        [['incoming', footerIncoming], ['extra', footerExtras], ['outgoing', footerOutgoing]].forEach(function(item) { const cell = document.getElementById('rc-footer-' + item[0]); if (cell) cell.textContent = footerMoney(item[1]); });
         // Os cards preservam os totais calculados no servidor para o período.
         // Filtros de visualização afetam somente as linhas da tabela.
     }
@@ -1328,7 +1339,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                                 <?php endif; ?>
                                             </td>
 
-                                            <td><?php if ($row['entrada'] > 0): ?><?php echo $row['_extra'] === null ? '<span title="Sem vínculo único compatível com o pagamento do título">Não identificado</span>' : ($row['_extra'] > 0 ? '<span class="rc-extra-paid">'.bt_money($row['_extra']).'</span>' : bt_money(0)); ?><?php else: ?>--<?php endif; ?></td>
+                                            <td><?php if ($row['entrada'] > 0): ?><?php echo $row['_extra'] === null ? '<span title="Sem vínculo único compatível com o pagamento do título">Não identificado</span>' : ($row['_extra'] > 0 ? '<span class="rc-extra-paid" title="Acréscimos pagos do título — juros e multa, já incluídos na entrada">'.bt_money($row['_extra']).'</span>' : bt_money(0)); ?><?php else: ?>--<?php endif; ?></td>
 
                                             <td>
                                                 <?php if ($row['saida'] > 0): ?>
@@ -1360,6 +1371,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         </tr>
                                         <?php endforeach; ?>
                                 </tbody>
+                                <tfoot><tr><th colspan="5" scope="row">Totais das linhas exibidas</th><td id="rc-footer-incoming"><?php echo bt_money((int)round($tot_entrada * 100)); ?></td><td id="rc-footer-extra" class="rc-extra-total" title="Acréscimos já incluídos nas entradas"><?php echo bt_money($rc_extras['total']); ?></td><td id="rc-footer-outgoing"><?php echo bt_money((int)round($tot_saida * 100)); ?></td><td colspan="2"></td></tr></tfoot>
                             </table>
                         </div>
 
