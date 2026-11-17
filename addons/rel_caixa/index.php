@@ -2,6 +2,7 @@
 // INCLUE FUNCOES DE ADDONS -----------------------------------------------------------------------
 include('addons.class.php');
 require_once __DIR__ . '/loja_lib.php';
+require_once __DIR__ . '/acrescimos_lib.php';
 
 // VERIFICA SE O USUARIO ESTA LOGADO --------------------------------------------------------------
 session_name('mka');
@@ -30,6 +31,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
+    #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(4,minmax(0,1fr)) minmax(130px,.85fr); }
+    #rc-caixa .rc-extras-card .stat-value { font-size: 17px; }
+    @media(max-width:900px) { #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+
     :root {
         --primary: #6e7aff;
         --primary-dark: #4ce65b;
@@ -946,14 +951,14 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const line = values => values.map(cell).join(';');
         const amount = value => Math.round(Number(value.replace(/[^0-9,-]/g, '').replace(',', '.')) * 100) || 0;
         const money = value => (value / 100).toFixed(2).replace('.', ',');
-        let incoming = 0, outgoing = 0;
+        let incoming = 0, outgoing = 0, extras = 0;
         const content = [line(['Conferência de caixa — linhas visíveis']), line([document.querySelector('.rc-print-period').textContent])];
         if (table) content.push(line(Array.from(table.querySelectorAll('thead th')).map(th => th.textContent)));
         rows.forEach(row => {
             const values = Array.from(row.cells).map(td => td.textContent.trim());
-            incoming += amount(values[5]); outgoing += amount(values[6]); content.push(line(values));
+            incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0); extras += Number(row.dataset.extra || 0); content.push(line(values));
         });
-        content.push(line(['Linhas exportadas', rows.length]), line(['Total entradas', money(incoming)]), line(['Total saídas', money(outgoing)]), line(['Resultado das linhas exportadas', money(incoming - outgoing)]));
+        content.push(line(['Linhas exportadas', rows.length]), line(['Total entradas', money(incoming)]), line(['Total saídas', money(outgoing)]), line(['Acréscimos identificados (já incluídos nas entradas)', money(extras)]), line(['Resultado das linhas exportadas', money(incoming - outgoing)]));
         const url = URL.createObjectURL(new Blob(['\ufeff' + content.join('\r\n')], {type: 'text/csv;charset=utf-8;'}));
         const a = document.createElement('a'); a.href = url; a.download = 'conferencia-caixa.csv'; a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
@@ -1183,6 +1188,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     $query .= " ORDER BY c.data DESC";
                     $result = mysqli_query($link, $query);
 
+                    $rc_cash_rows = array();
+                    while ($rc_row = mysqli_fetch_assoc($result)) $rc_cash_rows[] = $rc_row;
+                    $rc_extras = rc_extra_load($link, $rc_cash_rows);
+                    mysqli_data_seek($result, 0);
                     $tot_entrada = 0;
                     $total_boletos_ = 0;
                     $tot_saida = 0;
@@ -1198,7 +1207,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     $saldo = $tot_entrada - $tot_saida;
                     ?>
 
-                    <div class="stats-bar">
+                    <div class="stats-bar rc-cash-stats">
                         <div class="stat-item boletos" data-filter="entrada" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente recebimentos">
                             <div class="stat-icon">📊</div>
                             <div class="stat-content">
@@ -1230,8 +1239,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                 <div class="stat-value">R$ <?php echo number_format($saldo, 2, ',', '.'); ?></div>
                             </div>
                         </div>
+                        <div class="stat-item rc-extras-card" title="Diferença positiva entre valor pago e valor original. Já incluída nas entradas."><div class="stat-content"><div class="stat-label">Acréscimos pagos</div><div class="stat-value"><?php echo bt_money($rc_extras['total']); ?></div></div></div>
                     </div>
 
+<p class="bt-note">Acréscimos pagos = diferença positiva entre o valor pago e o valor original do título (juros e multa juntos), já incluída nas entradas. “Não identificado” indica recebimento sem vínculo único compatível com o pagamento do título. <?php echo (int)$rc_extras['unknown']; ?> recebimento(s) não identificado(s). A classificação usa os valores atuais do título.</p>
 <p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV exporta as linhas visíveis; a impressão mantém os totais do período e a tabela filtrada.</p>
                     <?php include('conferencia_content.php'); ?>
                     <div class="rc-tools"><div><h2>Lançamentos</h2><p>Consulte os detalhes de cada movimentação.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
@@ -1247,6 +1258,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         <th>Usuário</th>
                                         <th>Histórico</th>
                                         <th>Entrada</th>
+                                        <th>Acréscimos pagos</th>
                                         <th>Saída</th>
                                         <th>Título</th>
                                         <th>Vencimento</th>
@@ -1273,7 +1285,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
                                         $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'];
                                         ?>
-                                        <tr data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <tr data-extra="<?php echo (int)$rc_extras['values'][$rowNumber]; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
 
@@ -1312,6 +1324,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                                     --
                                                 <?php endif; ?>
                                             </td>
+
+                                            <td><?php if ($row['entrada'] > 0): ?><?php echo $rc_extras['values'][$rowNumber] === null ? '<span title="Sem vínculo único compatível com o pagamento do título">Não identificado</span>' : bt_money($rc_extras['values'][$rowNumber]); ?><?php else: ?>--<?php endif; ?></td>
 
                                             <td>
                                                 <?php if ($row['saida'] > 0): ?>

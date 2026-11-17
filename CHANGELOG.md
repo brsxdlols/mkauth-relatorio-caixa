@@ -1,3 +1,9 @@
+# 3.7.7 — 2026-11-17
+
+- Coluna e card compacto de Acréscimos pagos: diferença positiva entre valor pago e original, já incluída nas entradas.
+- Vincula apenas recebimento único com valor e data compatíveis com o título pago; casos sem identificação ficam explícitos.
+- Exporta o detalhamento e total de acréscimos sem somá-los novamente ao saldo.
+
 # 3.7.6 — 2026-11-17
 
 - Compensa a altura do menu fixo uma única vez no html do Caixa, eliminando o espaçador nativo antigo apenas nesta página.
