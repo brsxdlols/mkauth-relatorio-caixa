@@ -1,3 +1,8 @@
+# 3.7.10 — 2026-11-17
+
+- Atalho CAIXA HOJE abre a data atual, com todos os recebimentos e sem filtros anteriores.
+- Renomeia o botão de taxas para explicitar seu efeito na tabela e esclarece que os cards sempre incluem as taxas.
+
 # 3.7.9 — 2026-11-17
 
 - Totais de entradas, acréscimos e saídas no rodapé da tabela, respeitando busca, cards e visibilidade das tarifas.

@@ -31,6 +31,12 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
+    #rc-caixa .rc-today-card { margin-left: auto; display: flex; flex-direction: column; gap: 3px; background: #e9f4ff; border: 1px solid #1685d1; border-radius: 6px; padding: 9px 14px; color: #075a9e; text-decoration: none; }
+    #rc-caixa .rc-today-card strong { font-size: 13px; }
+    #rc-caixa .rc-today-card span { font-size: 11px; }
+    #rc-caixa .rc-today-card:hover, #rc-caixa .rc-today-card:focus-visible { background: #d7ebff; outline: 2px solid #1685d1; outline-offset: 2px; }
+    @media(max-width:700px) { #rc-caixa .rc-today-card { margin-left: 0; width: 100%; } }
+
     #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(4,minmax(0,1fr)) minmax(130px,.85fr); }
     #rc-caixa .finance-table tfoot th, #rc-caixa .finance-table tfoot td { background: #edf5ff; border-top: 2px solid #1285cf; font-weight: 700; padding: 12px 10px; white-space: nowrap; }
     #rc-caixa .finance-table tfoot #rc-footer-extra { color: #087f4f; }
@@ -988,7 +994,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
         const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row, #financeTableBody tr[data-fee]:not([data-fee="0"])');
         const feeButton = document.getElementById('toggleButton');
-        if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Ocultar tarifas' : 'Mostrar tarifas'); }
+        if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Esconder taxas na tabela' : 'Exibir taxas na tabela'); }
         let footerIncoming = 0, footerOutgoing = 0, footerExtras = 0;
         document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row) {
             const matchesText = !term || normalizeSearch(row.dataset.search).indexOf(term) !== -1;
@@ -1018,7 +1024,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                 row.classList.remove('hidden');
             });
             const toggleButton = document.getElementById('toggleButton');
-            if (toggleButton) toggleButton.innerText = 'Ocultar tarifas';
+            if (toggleButton) toggleButton.innerText = 'Esconder taxas na tabela';
         }
         document.querySelectorAll('.stat-item[data-filter]').forEach(function(item) {
             item.classList.toggle('active-filter', item === card);
@@ -1168,8 +1174,10 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                             
                             <button type="submit" class="btn btn-primary">Aplicar período</button>
                             <button type="button" onclick="clearSearch()" class="btn btn-secondary">Limpar</button>
-                            <button type="button" id="toggleButton" onclick="toggleTarifaRows()" class="btn btn-secondary">Ocultar tarifas</button>
+                            <button type="button" id="toggleButton" onclick="toggleTarifaRows()" class="btn btn-secondary" aria-describedby="rc-fees-help" title="Mostra ou esconde taxas de boleto na tabela. Os cards mantêm o caixa completo.">Esconder taxas na tabela</button>
+                            <a class="rc-today-card" href="?tab=financeiro&amp;search=&amp;data_inicial=<?php echo date('Y-m-d'); ?>&amp;data_final=<?php echo date('Y-m-d'); ?>" title="Abrir o caixa de hoje e limpar todos os filtros"><strong>CAIXA HOJE</strong><span><?php echo date('d/m/Y'); ?> · Todos os recebimentos</span></a>
                         </form>
+                        <p id="rc-fees-help" class="bt-note" style="margin:8px 0 0">Taxas de boleto: o botão altera apenas a tabela, seus totais de baixo, CSV e impressão. Os cards do período sempre incluem as taxas.</p>
                     </div>
 
                     <?php
