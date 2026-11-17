@@ -34,3 +34,22 @@ function rc_extra_load($link,$rows) {
     }
     return rc_extra_map($rows,$titles);
 }
+
+function rc_cash_display($rows,$extras) {
+    $groups=array();$skip=array();
+    foreach($rows as $i=>$row) {
+        $rows[$i]['_extra']=$extras['values'][$i];$rows[$i]['_fee_amount']=0;$rows[$i]['_fee_history']='';
+        $id=rc_extra_title($row);if(!$id)continue;
+        $key=$id.'|'.$row['data'].'|'.$row['usuario'];
+        if(bt_cents($row['entrada'])>0 && bt_cents($row['saida'])===0)$groups[$key]['entries'][]=$i;
+        elseif(bt_cents($row['entrada'])===0 && lj_fee($row))$groups[$key]['fees'][]=$i;
+    }
+    foreach($groups as $group) {
+        if(empty($group['entries']) || empty($group['fees']) || count($group['entries'])!==1 || count($group['fees'])!==1)continue;
+        $entry=$group['entries'][0];$fee=$group['fees'][0];
+        $rows[$entry]['saida']=$rows[$fee]['saida'];
+        $rows[$entry]['_fee_amount']=bt_cents($rows[$fee]['saida']);$rows[$entry]['_fee_history']=$rows[$fee]['historico'];$skip[$fee]=true;
+    }
+    $display=array();foreach($rows as $i=>$row)if(!isset($skip[$i]))$display[]=$row;
+    return $display;
+}

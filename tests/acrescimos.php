@@ -11,3 +11,10 @@ $title['valor']='120.00';$r=rc_extra_map(array($receipt),array(5117=>$title));ex
 $title['status']='aberto';$r=rc_extra_map(array($receipt),array(5117=>$title));extra_check($r['values'][0]===null,'Título aberto');
 $title['status']='pago';$title['datapag']='2026-11-16';$r=rc_extra_map(array($receipt),array(5117=>$title));extra_check($r['values'][0]===null,'Outro dia');
 echo "OK: acréscimos, tarifas, duplicidade, pagamento parcial, desconto e data.\n";
+
+require_once dirname(__DIR__).'/addons/rel_caixa/loja_lib.php';
+$receipt['usuario']='lytex';$fee['usuario']='lytex';$fee['historico']='Descontado a tarifa do titulo: 5117';
+$display=rc_cash_display(array($fee,$receipt),array('values'=>array(null,409)));extra_check(count($display)===1&&bt_cents($display[0]['entrada'])===11399&&bt_cents($display[0]['saida'])===138&&$display[0]['_extra']===409,'Agrupa recebimento e tarifa sem alterar valores');
+$display=rc_cash_display(array($fee,$receipt,$receipt),array('values'=>array(null,null,null)));extra_check(count($display)===3,'Não agrupa pares ambíguos');
+$fee['usuario']='outro';$display=rc_cash_display(array($fee,$receipt),array('values'=>array(null,409)));extra_check(count($display)===2,'Não agrupa usuários diferentes');
+echo "OK: agrupamento seguro de recebimento e tarifa.\n";

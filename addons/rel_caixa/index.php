@@ -32,7 +32,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
     #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(4,minmax(0,1fr)) minmax(130px,.85fr); }
-    #rc-caixa .rc-extras-card .stat-value { font-size: 17px; }
+    #rc-caixa .rc-extras-card .stat-value { font-size: 17px; color: #087f4f; }
+    #rc-caixa .rc-extra-paid { color: #087f4f; background: #d1fae5; font-weight: 600; border-radius: 4px; padding: 3px 6px; display: inline-block; }
     @media(max-width:900px) { #rc-caixa #content-financeiro .rc-cash-stats { grid-template-columns: repeat(2,minmax(0,1fr)); } }
 
     :root {
@@ -956,7 +957,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         if (table) content.push(line(Array.from(table.querySelectorAll('thead th')).map(th => th.textContent)));
         rows.forEach(row => {
             const values = Array.from(row.cells).map(td => td.textContent.trim());
-            incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0); extras += Number(row.dataset.extra || 0); content.push(line(values));
+            incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0) - (tariffsVisible ? 0 : Number(row.dataset.fee || 0)); if (!tariffsVisible && Number(row.dataset.fee || 0) > 0) values[7] = '--'; extras += Number(row.dataset.extra || 0); content.push(line(values));
         });
         content.push(line(['Linhas exportadas', rows.length]), line(['Total entradas', money(incoming)]), line(['Total saídas', money(outgoing)]), line(['Acréscimos identificados (já incluídos nas entradas)', money(extras)]), line(['Resultado das linhas exportadas', money(incoming - outgoing)]));
         const url = URL.createObjectURL(new Blob(['\ufeff' + content.join('\r\n')], {type: 'text/csv;charset=utf-8;'}));
@@ -982,15 +983,16 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         const searchInput = document.getElementById('search');
         const term = normalizeSearch(searchInput ? searchInput.value.trim() : '');
 
-        const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row');
+        const feeRows = document.querySelectorAll('#financeTableBody tr.tarifa-row, #financeTableBody tr[data-fee]:not([data-fee="0"])');
         const feeButton = document.getElementById('toggleButton');
         if (feeButton) { feeButton.disabled = !feeRows.length; feeButton.textContent = !feeRows.length ? 'Sem tarifas no período' : (tariffsVisible ? 'Ocultar tarifas' : 'Mostrar tarifas'); }
         document.querySelectorAll('#financeTableBody tr[data-search]').forEach(function(row) {
             const matchesText = !term || normalizeSearch(row.dataset.search).indexOf(term) !== -1;
             const movement = row.dataset.movement || 'outro';
-            const matchesMovement = movementFilter === 'todos' || movement === movementFilter;
+            const matchesMovement = movementFilter === 'todos' || movement === movementFilter || (movementFilter === 'saida' && Number(row.dataset.outgoing || 0) > 0) || (movementFilter === 'acrescimos' && Number(row.dataset.extra || 0) > 0);
             const feeHidden = row.classList.contains('tarifa-row') && !tariffsVisible;
             row.classList.toggle('hidden', feeHidden);
+            row.querySelectorAll('.rc-grouped-fee').forEach(function(value) { value.classList.toggle('hidden', !tariffsVisible); });
             row.classList.toggle('filter-hidden', !(matchesText && matchesMovement));
         });
         // Os cards preservam os totais calculados no servidor para o período.
@@ -1191,6 +1193,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     $rc_cash_rows = array();
                     while ($rc_row = mysqli_fetch_assoc($result)) $rc_cash_rows[] = $rc_row;
                     $rc_extras = rc_extra_load($link, $rc_cash_rows);
+                    $rc_display_rows = rc_cash_display($rc_cash_rows, $rc_extras);
                     mysqli_data_seek($result, 0);
                     $tot_entrada = 0;
                     $total_boletos_ = 0;
@@ -1239,13 +1242,13 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                 <div class="stat-value">R$ <?php echo number_format($saldo, 2, ',', '.'); ?></div>
                             </div>
                         </div>
-                        <div class="stat-item rc-extras-card" title="Diferença positiva entre valor pago e valor original. Já incluída nas entradas."><div class="stat-content"><div class="stat-label">Acréscimos pagos</div><div class="stat-value"><?php echo bt_money($rc_extras['total']); ?></div></div></div>
+                        <div class="stat-item rc-extras-card" data-filter="acrescimos" role="button" tabindex="0" aria-pressed="false" title="Mostrar somente recebimentos com acréscimos pagos. Já incluídos nas entradas."><div class="stat-content"><div class="stat-label">Acréscimos pagos</div><div class="stat-value"><?php echo bt_money($rc_extras['total']); ?></div></div></div>
                     </div>
 
 <p class="bt-note">Acréscimos pagos = diferença positiva entre o valor pago e o valor original do título (juros e multa juntos), já incluída nas entradas. “Não identificado” indica recebimento sem vínculo único compatível com o pagamento do título. <?php echo (int)$rc_extras['unknown']; ?> recebimento(s) não identificado(s). A classificação usa os valores atuais do título.</p>
 <p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV exporta as linhas visíveis; a impressão mantém os totais do período e a tabela filtrada.</p>
                     <?php include('conferencia_content.php'); ?>
-                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Consulte os detalhes de cada movimentação.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
+                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="window.print()">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">
@@ -1267,7 +1270,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                 <tbody id="financeTableBody">
                                     <?php mysqli_data_seek($result, 0); ?>
                                     <?php $rowNumber = 0; ?>
-                                    <?php while ($row = mysqli_fetch_assoc($result)) : ?>
+                                    <?php foreach ($rc_display_rows as $rowNumber => $row) : ?>
                                         <?php
                                         $nomeClienteClass = ($rowNumber % 2 == 0) ? 'highlight' : '';
                                         $tarifaRowClass = lj_fee($row) ? 'tarifa-row' : '';
@@ -1283,9 +1286,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $login = isset($cliente_row['login']) ? $cliente_row['login'] : '--';
                                         $uuid_cliente = isset($cliente_row['uuid_cliente']) ? $cliente_row['uuid_cliente'] : '';
                                         $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
-                                        $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'];
+                                        $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'] . ' ' . $row['_fee_history'];
                                         ?>
-                                        <tr data-extra="<?php echo (int)$rc_extras['values'][$rowNumber]; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <tr data-fee="<?php echo (int)$row['_fee_amount']; ?>" data-extra="<?php echo (int)$row['_extra']; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
 
@@ -1325,11 +1328,11 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                                 <?php endif; ?>
                                             </td>
 
-                                            <td><?php if ($row['entrada'] > 0): ?><?php echo $rc_extras['values'][$rowNumber] === null ? '<span title="Sem vínculo único compatível com o pagamento do título">Não identificado</span>' : bt_money($rc_extras['values'][$rowNumber]); ?><?php else: ?>--<?php endif; ?></td>
+                                            <td><?php if ($row['entrada'] > 0): ?><?php echo $row['_extra'] === null ? '<span title="Sem vínculo único compatível com o pagamento do título">Não identificado</span>' : ($row['_extra'] > 0 ? '<span class="rc-extra-paid">'.bt_money($row['_extra']).'</span>' : bt_money(0)); ?><?php else: ?>--<?php endif; ?></td>
 
                                             <td>
                                                 <?php if ($row['saida'] > 0): ?>
-                                                    <span class="badge badge-danger">R$ <?php echo number_format($row['saida'], 2, ',', '.'); ?></span>
+                                                    <span class="badge badge-danger <?php echo $row['_fee_amount'] > 0 ? 'rc-grouped-fee' : ''; ?>" title="<?php echo htmlspecialchars(($row['_fee_amount'] > 0 || lj_fee($row)) ? 'Taxa do boleto — '.($row['_fee_history'] ?: $row['historico']) : $row['historico'], ENT_QUOTES, 'UTF-8'); ?>">R$ <?php echo number_format($row['saida'], 2, ',', '.'); ?></span>
                                                 <?php else: ?>
                                                     --
                                                 <?php endif; ?>
@@ -1355,8 +1358,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                                 ?>
                                             </td>
                                         </tr>
-                                        <?php $rowNumber++; ?>
-                                    <?php endwhile; ?>
+                                        <?php endforeach; ?>
                                 </tbody>
                             </table>
                         </div>

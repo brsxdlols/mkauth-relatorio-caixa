@@ -1,3 +1,10 @@
+# 3.7.8 — 2026-11-17
+
+- Une recebimento e taxa de boleto em uma linha quando o par de título, data e usuário é único; preserva lançamentos originais e mostra a descrição da taxa ao passar o mouse.
+
+- Card de acréscimos agora filtra recebimentos com acréscimos positivos, com suporte a teclado, preservando os totais do período.
+- Destaca em verde o valor do card e os acréscimos positivos na tabela.
+
 # 3.7.7 — 2026-11-17
 
 - Coluna e card compacto de Acréscimos pagos: diferença positiva entre valor pago e original, já incluída nas entradas.
