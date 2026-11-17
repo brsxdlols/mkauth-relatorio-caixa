@@ -11,15 +11,18 @@
     #rc-caixa .rc-page-header > div { min-width: 0; }
     #rc-caixa .finance-table { min-width: 0; width: 100%; table-layout: fixed; }
     #rc-caixa .finance-table th, #rc-caixa .finance-table td { min-width: 0; max-width: none; overflow-wrap: anywhere; }
-    #rc-caixa .finance-table td:nth-child(3) { white-space: normal; }
+    #rc-caixa .finance-table thead th { white-space: normal; overflow-wrap: anywhere; word-break: normal; line-height: 1.3; font-size: 12px; letter-spacing: 0; padding: 10px 6px; vertical-align: middle; }
+    #rc-caixa .finance-table td:nth-child(3), #rc-caixa .finance-table td:nth-child(10) { white-space: normal; }
     #rc-caixa .finance-table th:nth-child(1) { width: 21%; }
-    #rc-caixa .finance-table th:nth-child(2) { width: 9%; }
+    #rc-caixa .finance-table th:nth-child(2) { width: 8%; }
     #rc-caixa .finance-table th:nth-child(3) { width: 12%; }
     #rc-caixa .finance-table th:nth-child(4) { width: 6%; }
-    #rc-caixa .finance-table th:nth-child(5) { width: 22%; }
-    #rc-caixa .finance-table th:nth-child(6), #rc-caixa .finance-table th:nth-child(7) { width: 7%; }
-    #rc-caixa .finance-table th:nth-child(8), #rc-caixa .finance-table th:nth-child(10) { width: 6%; }
-    #rc-caixa .finance-table th:nth-child(9) { width: 4%; }
+    #rc-caixa .finance-table th:nth-child(5) { width: 15%; }
+    #rc-caixa .finance-table th:nth-child(6) { width: 9%; }
+    #rc-caixa .finance-table th:nth-child(7) { width: 9%; }
+    #rc-caixa .finance-table th:nth-child(8) { width: 7%; }
+    #rc-caixa .finance-table th:nth-child(10) { width: 8%; }
+    #rc-caixa .finance-table th:nth-child(9) { width: 5%; }
     #rc-caixa .finance-table tfoot th { width: auto; }
 }
 @media screen and (max-width:1199px) and (min-width:901px) {
@@ -32,3 +35,16 @@
     #rc-caixa .finance-table { min-width: 1100px; }
     #rc-caixa .stat-value { font-size: 17px; }
 }
+
+/* The native reset removes the browser's automatic dialog centering. */
+#rc-print-dialog { position: fixed; inset: 0; margin: auto; box-sizing: border-box; overflow: hidden; font-family: 'Segoe UI',Arial,sans-serif; }
+#rc-print-dialog::backdrop { background: rgba(12,30,49,.48); }
+#rc-print-dialog .rc-print-options { display: grid; gap: 12px; margin: 18px 0; }
+#rc-print-dialog .rc-print-option { padding: 16px; width: 100%; text-align: left; color: #123e64; background: #edf6ff; border: 1px solid #a5c9e9; border-radius: 6px; cursor: pointer; }
+#rc-print-dialog .rc-print-option strong, #rc-print-dialog .rc-print-option span { display: block; pointer-events: none; }
+#rc-print-dialog .rc-print-option strong { font-size: 15px; margin-bottom: 5px; }
+#rc-print-dialog .rc-print-option span { font-size: 13px; line-height: 1.45; }
+#rc-print-dialog .rc-print-option:hover, #rc-print-dialog .rc-print-option:focus-visible { background: #dceeff; outline: 2px solid #1685d1; }
+#rc-print-dialog .rc-print-cancel { padding: 9px 16px; background: white; color: #315776; border: 1px solid #a5bed3; border-radius: 5px; cursor: pointer; }
+
+@media screen and (max-width:1199px) { #rc-caixa .finance-table thead th { font-size: 11px; padding: 8px 4px; } }

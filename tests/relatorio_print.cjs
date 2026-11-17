@@ -7,3 +7,7 @@ if(process.env.RC_REPORT_PREVIEW){fs.writeFileSync('../relatorio-simples-preview
 assert(build({...data,rows:[]},false).includes('Nenhum lançamento atende aos filtros.'));
 const hidden=build({...data,scope:'Taxas ocultas',rows:data.rows.map(r=>({...r,outgoing:0,fee:0}))},true);assert(hidden.includes('Resultado: R$ 113,99'));assert(!hidden.includes('<td>Taxa de boleto</td>'));
 console.log('OK: relatório simples/detalhado, totais em centavos, filtros, taxas e escape de HTML.');
+
+const longReport=build({...data,rows:Array.from({length:16},()=>({...data.rows[0],date:'17-11-2026 18:01:05'}))},true);
+assert(longReport.includes('class="report-break"'));assert(longReport.includes('17/11/2026 18:01:05'));assert(longReport.includes('class="summaries"'));assert(longReport.includes('font-size:11px'));
+console.log('OK: relatório longo tem resumos compactos, datas brasileiras e quebra antes dos lançamentos.');

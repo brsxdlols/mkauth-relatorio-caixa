@@ -1,3 +1,9 @@
+# 3.7.13 — 2026-11-17
+
+- Corrige sobreposição dos cabeçalhos da tabela com quebra e distribuição das colunas.
+- Centraliza e estiliza a escolha do relatório, com prévia flexível e uma única rolagem interna.
+- Detalhado organiza resumos em duas colunas e separa lançamentos longos em nova página na impressão, com fonte legível.
+
 # 3.7.12 — 2026-11-17
 
 - Mantém os cinco cards em uma linha no desktop e remove larguras mínimas que expandiam a página.

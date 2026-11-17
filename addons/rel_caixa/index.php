@@ -1283,7 +1283,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                     </div>
 
 <p class="bt-note">Acréscimos pagos = diferença positiva entre o valor pago e o valor original do título (juros e multa juntos), já incluída nas entradas. “Não identificado” indica recebimento sem vínculo único compatível com o pagamento do título. <?php echo (int)$rc_extras['unknown']; ?> recebimento(s) não identificado(s). A classificação usa os valores atuais do título.</p>
-<p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV exporta as linhas visíveis; a impressão mantém os totais do período e a tabela filtrada.</p>
+<p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV e relatórios de impressão acompanham os filtros da tabela e a escolha de exibir taxas.</p>
                     <?php include('conferencia_content.php'); ?>
                     <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="rcPrintChoose('financeiro')">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
