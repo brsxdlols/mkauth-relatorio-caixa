@@ -1,3 +1,13 @@
+# 3.7.18 — 2026-11-17
+
+- Atalhos CAIXA SEMANA (domingo a sábado) e CAIXA MÊS (mês atual completo), com datas explícitas e filtros limpos.
+
+- Baixar PDF direto nos modelos Simples e Detalhado, com geração local no navegador e sem cabeçalhos/URLs do Chrome.
+
+- Menu do Caixa por seletor no mobile, sincronizado com todas as guias.
+- Ajusta cabeçalho, atalhos, filtros, cards, gráficos, tabelas e modelos ao toque e à largura do celular.
+- Prévia dos relatórios adapta resumos e tabelas ao mobile sem alterar a impressão. Regras restritas à página do addon.
+
 # 3.7.17 — 2026-11-17
 
 - Valores sem fundos coloridos: entradas verdes, acréscimos azuis e tarifas/saídas vermelhas.

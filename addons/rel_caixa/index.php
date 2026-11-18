@@ -3,6 +3,8 @@
 include('addons.class.php');
 require_once __DIR__ . '/loja_lib.php';
 require_once __DIR__ . '/acrescimos_lib.php';
+require_once __DIR__ . '/periodos_lib.php';
+$rc_quick_periods = rc_cash_periods();
 
 // VERIFICA SE O USUARIO ESTA LOGADO --------------------------------------------------------------
 session_name('mka');
@@ -31,7 +33,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
 <link href="navbar_layout.css" rel="stylesheet" type="text/css" />
 <style>
-    #rc-caixa .rc-shortcuts { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; max-width: 760px; margin: 4px auto 18px; }
+    #rc-caixa .rc-shortcuts { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; max-width: none; margin: 4px auto 18px; }
     #rc-caixa .rc-shortcut-card { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; min-height: 76px; padding: 14px; border: 1px solid #9ec9ed; border-radius: 7px; background: #edf6ff; color: #075a9e; text-decoration: none; text-align: center; cursor: pointer; font-family: inherit; }
     #rc-caixa .rc-shortcut-card strong { font-size: 14px; }
     #rc-caixa .rc-shortcut-card span { font-size: 12px; color: #315d80; }
@@ -1108,6 +1110,8 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         // Add active class to selected tab and content
         document.getElementById('tab-' + tabName).classList.add('active');
         document.getElementById('content-' + tabName).classList.add('active');
+        const mobileTab = document.getElementById('rc-mobile-tab');
+        if (mobileTab) mobileTab.value = tabName;
         
         // Atualizar URL com a aba ativa (sem recarregar a página)
         const currentUrl = new URL(window.location.href);
@@ -1140,6 +1144,11 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 
         <!-- TABS -->
         <div class="tabs-container">
+            <label class="rc-mobile-navigation" for="rc-mobile-tab">Menu do caixa
+                <select id="rc-mobile-tab" onchange="switchTab(this.value)">
+                    <option value="financeiro">Movimentações</option><option value="graficos">Gráficos</option><option value="ticket">Ticket médio</option><option value="evolucao">Evolução</option><option value="loja">Caixa personalizado</option><option value="carteiras">Títulos por banco</option><option value="problemas">Problemas nos boletos</option><option value="anomalias">Anomalias</option>
+                </select>
+            </label>
             <div class="tabs">
                 <button class="tab-button active" id="tab-financeiro" onclick="switchTab('financeiro')">
                     <span aria-hidden="true">📋</span> Movimentações
@@ -1172,7 +1181,9 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             <div id="content-financeiro" class="tab-content active">
                 <div class="content-wrapper">
                     <div class="rc-shortcuts" aria-label="Acessos rápidos do caixa">
-                        <a class="rc-shortcut-card" href="?tab=financeiro&amp;search=&amp;data_inicial=<?php echo date('Y-m-d'); ?>&amp;data_final=<?php echo date('Y-m-d'); ?>" title="Abrir o caixa de hoje e limpar todos os filtros"><strong>CAIXA HOJE</strong><span><?php echo date('d/m/Y'); ?> · Todos os recebimentos</span></a>
+                        <?php foreach ($rc_quick_periods as $rc_shortcut): ?>
+                        <a class="rc-shortcut-card" href="?<?php echo htmlspecialchars(http_build_query(array('tab'=>'financeiro','search'=>'','data_inicial'=>$rc_shortcut['start'],'data_final'=>$rc_shortcut['end'])),ENT_QUOTES,'UTF-8'); ?>" title="Abrir o período e limpar todos os filtros"><strong><?php echo htmlspecialchars($rc_shortcut['label'],ENT_QUOTES,'UTF-8'); ?></strong><span><?php echo htmlspecialchars($rc_shortcut['display'],ENT_QUOTES,'UTF-8'); ?></span></a>
+                        <?php endforeach; ?>
                         <button type="button" class="rc-shortcut-card" id="rc-conference-shortcut" aria-controls="rc-full-conference" aria-expanded="false" onclick="rcOpenConference()"><strong>CONFERÊNCIA COMPLETA</strong><span>Resumos e alertas de todos os clientes do período</span></button>
                     </div>
                     <div class="search-form">
@@ -1287,7 +1298,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <p class="bt-note">Acréscimos pagos = diferença positiva entre o valor pago e o valor original do título (juros e multa juntos), já incluída nas entradas. “Não identificado” indica recebimento sem vínculo único compatível com o pagamento do título. <?php echo (int)$rc_extras['unknown']; ?> recebimento(s) não identificado(s). A classificação usa os valores atuais do título.</p>
 <p class="bt-note">Os cards mostram o caixa completo do período, incluindo todas as saídas e tarifas. Clique nos cards para filtrar somente a tabela; clique no resultado para ver tudo. CSV e relatórios de impressão acompanham os filtros da tabela e a escolha de exibir taxas.</p>
                     <?php include('conferencia_content.php'); ?>
-                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="rcPrintChoose('financeiro')">Imprimir</button></div></div>
+                    <div class="rc-tools"><div><h2>Lançamentos</h2><p>Recebimento e taxa do boleto aparecem juntos quando há vínculo único de título, data e usuário.</p></div><div class="rc-tool-actions"><button type="button" class="btn btn-primary" onclick="rcPrintChoose('financeiro','download')">Baixar PDF</button> <button type="button" class="btn btn-secondary" onclick="rcExport()">Exportar CSV</button> <button type="button" class="btn btn-secondary" onclick="rcPrintChoose('financeiro')">Imprimir</button></div></div>
                     <p class="rc-print-period">Período: <?php echo rc_escape($rc_label); ?> · Gerado em <?php echo date('d/m/Y H:i'); ?> · Totais dos cards: consulta enviada ao servidor.</p>
                     <?php if ($result && mysqli_num_rows($result) > 0) : ?>
                         <div class="table-wrapper">

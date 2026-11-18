@@ -21,3 +21,4 @@ jobs:
         run: |
           node tests/finance_filters.cjs
           node tests/relatorio_print.cjs
+          node tests/pdf_download.cjs
