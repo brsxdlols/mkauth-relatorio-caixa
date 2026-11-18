@@ -1023,7 +1023,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
             }
         });
         const footerMoney = value => 'R$ ' + (value / 100).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        [['incoming', footerIncoming], ['extra', footerExtras], ['outgoing', footerOutgoing]].forEach(function(item) { const cell = document.getElementById('rc-footer-' + item[0]); if (cell) cell.textContent = footerMoney(item[1]); });
+        [['incoming', footerIncoming], ['extra', footerExtras], ['outgoing', footerOutgoing], ['net', footerIncoming - footerOutgoing]].forEach(function(item) { const cell = document.getElementById('rc-footer-' + item[0]); if (cell) cell.textContent = footerMoney(item[1]); });
         // Os cards preservam os totais calculados no servidor para o período.
         // Filtros de visualização afetam somente as linhas da tabela.
     }
@@ -1400,7 +1400,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         </tr>
                                         <?php endforeach; ?>
                                 </tbody>
-                                <tfoot><tr><th colspan="5" scope="row">Totais das linhas exibidas</th><td id="rc-footer-incoming"><?php echo bt_money((int)round($tot_entrada * 100)); ?></td><td id="rc-footer-extra" class="rc-extra-total" title="Acréscimos já incluídos nas entradas"><?php echo bt_money($rc_extras['total']); ?></td><td id="rc-footer-outgoing"><?php echo bt_money((int)round($tot_saida * 100)); ?></td><td colspan="2"></td></tr></tfoot>
+                                <tfoot><tr><th colspan="5" scope="row">TOTAL</th><td id="rc-footer-incoming"><?php echo bt_money((int)round($tot_entrada * 100)); ?></td><td id="rc-footer-extra" class="rc-extra-total" title="Acréscimos já incluídos nas entradas"><?php echo bt_money($rc_extras['total']); ?></td><td id="rc-footer-outgoing"><?php echo bt_money((int)round($tot_saida * 100)); ?></td><td colspan="2"></td></tr><tr class="rc-net-row"><th colspan="7" scope="row">SUBTOTAL DO CAIXA</th><td colspan="3" id="rc-footer-net"><?php echo bt_money((int)round(($tot_entrada - $tot_saida) * 100)); ?></td></tr></tfoot>
                             </table>
                         </div>
 

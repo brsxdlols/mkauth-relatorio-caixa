@@ -3,7 +3,7 @@ const source = fs.readFileSync('addons/rel_caixa/index.php','utf8');
 const fragment = source.slice(source.indexOf("    let movementFilter ="), source.indexOf("    window.addEventListener('beforeprint'"));
 function row(movement,fee) { const classes = new Set(fee ? ['tarifa-row'] : []); return {querySelectorAll:()=>[],dataset:{movement,search:'cliente teste'},classList:{contains:c=>classes.has(c),remove:c=>classes.delete(c),toggle:(c,on)=>on?classes.add(c):classes.delete(c)}, classes}; }
 const entry=row('entrada',false), expense=row('saida',true), rows=[entry,expense];
-const footer={'rc-footer-incoming':{},'rc-footer-extra':{},'rc-footer-outgoing':{}};
+const footer={'rc-footer-incoming':{},'rc-footer-extra':{},'rc-footer-outgoing':{},'rc-footer-net':{}};
 const button={}, search={value:''};
 const context={window:{},document:{getElementById:id=>id==='search'?search:(footer[id]||button),querySelectorAll:sel=>sel.includes('[data-search]')?rows:sel.includes('tarifa-row')?[expense]:[],querySelector:()=>{throw Error('Filtros não podem reescrever os totais do caixa');}}};
 vm.createContext(context);vm.runInContext(fragment,context);
@@ -29,3 +29,7 @@ assert.strictEqual(footer['rc-footer-outgoing'].textContent.replace(/\s/g,''),'R
 vm.runInContext('tariffsVisible=false; applyTableFilters()',context);assert.strictEqual(footer['rc-footer-outgoing'].textContent.replace(/\s/g,''),'R$0,00');
 search.value='outro';vm.runInContext('applyTableFilters()',context);assert.strictEqual(footer['rc-footer-incoming'].textContent.replace(/\s/g,''),'R$0,00');
 console.log('OK: totais do rodapé respeitam agrupamento, busca e tarifas sem alterar cards.');
+
+search.value='';vm.runInContext('tariffsVisible=true; applyTableFilters()',context);assert.strictEqual(footer['rc-footer-net'].textContent.replace(/\s/g,''),'R$112,61');
+vm.runInContext('tariffsVisible=false; applyTableFilters()',context);assert.strictEqual(footer['rc-footer-net'].textContent.replace(/\s/g,''),'R$113,99');
+console.log('OK: subtotal do caixa acompanha os filtros e não desconta tarifas duas vezes.');

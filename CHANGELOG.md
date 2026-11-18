@@ -1,3 +1,9 @@
+# 3.7.17 — 2026-11-17
+
+- Valores sem fundos coloridos: entradas verdes, acréscimos azuis e tarifas/saídas vermelhas.
+- Rodapé da tela com TOTAL alinhado à direita e subtotal do caixa. Relatórios incluem subtotal por linha e no fechamento.
+- Orienta desativar cabeçalhos e rodapés do navegador para não imprimir a URL.
+
 # 3.7.16 — 2026-11-17
 
 - Relatórios simples e detalhados mostram coluna e total de tarifas de boleto separados da saída total.

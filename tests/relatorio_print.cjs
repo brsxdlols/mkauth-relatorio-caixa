@@ -5,7 +5,7 @@ assert.deepStrictEqual(totals(data.rows),{incoming:11399,outgoing:138,extra:409,
 const simple=build(data,false),detail=build(data,true);assert(simple.includes('R$ 112,61'));assert(simple.includes('01/11/2026 a 17/11/2026'));assert(!simple.includes('<script>alert'));assert(simple.includes('&lt;script&gt;'));assert(!simple.includes('Por conta bancária'));['Por conta bancária','Por forma de recebimento','Por motivo','Por usuário','Taxa de boleto','Conta A'].forEach(x=>assert(detail.includes(x)));assert(!detail.includes('mk-auth.css'));assert(detail.includes('Acréscimos identificados: R$ 4,09'));
 if(process.env.RC_REPORT_PREVIEW){fs.writeFileSync('../relatorio-simples-preview.html',simple);fs.writeFileSync('../relatorio-detalhado-preview.html',detail);}
 assert(build({...data,rows:[]},false).includes('Nenhum lançamento atende aos filtros.'));
-const hidden=build({...data,scope:'Taxas ocultas',rows:data.rows.map(r=>({...r,outgoing:0,fee:0}))},true);assert(hidden.includes('Resultado: R$ 113,99'));assert(!hidden.includes('<td>Taxa de boleto</td>'));
+const hidden=build({...data,scope:'Taxas ocultas',rows:data.rows.map(r=>({...r,outgoing:0,fee:0}))},true);assert(hidden.includes('Subtotal do caixa: R$ 113,99'));assert(!hidden.includes('<td>Taxa de boleto</td>'));
 console.log('OK: relatório simples/detalhado, totais em centavos, filtros, taxas e escape de HTML.');
 
 const longReport=build({...data,rows:Array.from({length:16},()=>({...data.rows[0],date:'17-11-2026 18:01:05'}))},true);
@@ -20,7 +20,7 @@ console.log('OK: identidade do provedor no cabeçalho, CNPJ e logo com conteúdo
 const identified=build({...data,provider:{name:'Nome do Provedor',legalName:'Razão Social Exemplo LTDA',cnpj:'11.222.333/0001-44',logo:''}},true);assert(identified.includes('Razão social: Razão Social Exemplo LTDA'));assert(identified.indexOf('Nome do Provedor')<identified.indexOf('Razão social:'));assert(identified.indexOf('Razão social:')<identified.indexOf('CNPJ:'));
 console.log('OK: nome do provedor primeiro, razão social e CNPJ separados.');
 
-for (const report of [simple,detail]) {assert(report.includes('Tarifas de boleto</th>'));assert(report.includes('Tarifas de boleto: R$ 1,38'));assert(report.includes('Saída total'));assert(report.includes('Resultado: R$ 112,61'));}
+for (const report of [simple,detail]) {assert(report.includes('Tarifas de boleto</th>'));assert(report.includes('Tarifas de boleto: R$ 1,38'));assert(report.includes('Saída total'));assert(report.includes('Subtotal do caixa: R$ 112,61'));}
 const mixedFees=totals([...data.rows,{...data.rows[0],incoming:0,outgoing:1000,fee:0,extra:0}]);assert.strictEqual(mixedFees.fees,138);assert.strictEqual(mixedFees.outgoing,1138);assert.strictEqual(mixedFees.incoming-mixedFees.outgoing,10261);
 assert(hidden.includes('Tarifas de boleto: R$ 0,00'));
 console.log('OK: coluna e total de tarifas separados, outras saídas e resultado sem desconto duplicado.');

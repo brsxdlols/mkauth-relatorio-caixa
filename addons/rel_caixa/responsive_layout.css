@@ -53,3 +53,12 @@
 #rc-print-dialog .rc-preview-close span { font-size: 23px; line-height: 16px; font-weight: 400; }
 #rc-print-dialog .rc-preview-close:hover { background: #d8ebff; border-color: #1685d1; }
 #rc-print-dialog .rc-preview-close:focus-visible { outline: 2px solid #1685d1; outline-offset: 3px; }
+
+/* Financial values: colored text only, without pills or filled backgrounds. */
+#rc-caixa .finance-table .badge, #rc-caixa .finance-table .rc-extra-paid { background: transparent; background-image: none; border: 0; border-radius: 0; padding: 0; box-shadow: none; font-size: inherit; }
+#rc-caixa .finance-table tbody td:nth-child(6), #rc-caixa .finance-table .badge-success, #rc-caixa .finance-table tfoot #rc-footer-incoming, #rc-caixa .stat-item.entradas .stat-value { color: #087f4f; }
+#rc-caixa .finance-table tbody td:nth-child(7), #rc-caixa .finance-table .rc-extra-paid, #rc-caixa .finance-table tfoot #rc-footer-extra, #rc-caixa .rc-extras-card .stat-value { color: #076ab7; }
+#rc-caixa .finance-table tbody td:nth-child(8), #rc-caixa .finance-table .badge-danger { color: #be123c; }
+#rc-caixa .finance-table tfoot th { text-align: right; }
+#rc-caixa .finance-table tfoot th, #rc-caixa .finance-table tfoot td { background: white; }
+#rc-caixa .finance-table tfoot #rc-footer-net { color: #153b60; font-size: 15px; text-align: right; }
