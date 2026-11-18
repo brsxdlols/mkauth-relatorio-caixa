@@ -120,3 +120,28 @@
     html#rc-caixa-page #rc-caixa .rc-shortcut-card strong { font-size: 12px; line-height: 1.4; }
     html#rc-caixa-page #rc-caixa .rc-shortcut-card span { font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
 }
+
+/* Mobile records expose every field vertically instead of a sideways table. */
+@media screen and (max-width:900px) {
+    html#rc-caixa-page #systopo { width: 100%; min-width: 0; }
+    html#rc-caixa-page #systopo > .level-item { flex: 1 1 0; min-width: 0; }
+    html#rc-caixa-page #systopo > .level-item > div { width: 100%; min-width: 0; }
+    html#rc-caixa-page #systopo #UUE_NProvedor { white-space: normal; overflow-wrap: anywhere; }
+    html#rc-caixa-page #rc-caixa .table-container,
+    html#rc-caixa-page #rc-caixa .monthly-table,
+    html#rc-caixa-page #rc-caixa .anomalias-table,
+    html#rc-caixa-page #rc-caixa .lo-table-wrap,
+    html#rc-caixa-page #rc-caixa .bt-table-wrap { min-width: 0; max-width: 100%; overflow: visible; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table { display: block; width: 100%; min-width: 0; max-width: 100%; table-layout: auto; border: 0; background: transparent; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tbody,
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tfoot { display: block; width: 100%; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tr { display: block; width: 100%; margin: 0 0 12px; padding: 8px 12px; border: 1px solid #d4e1ed; border-radius: 8px; background: #fff; box-sizing: border-box; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tr[style*="display: none"] { display: none; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table td,
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tfoot th { display: block; width: auto; min-width: 0; max-width: 100%; padding: 8px 0; border: 0; border-bottom: 1px solid #edf1f5; text-align: left; white-space: normal; overflow-wrap: anywhere; font-size: 14px; line-height: 1.5; box-sizing: border-box; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table td[data-label]::before { content: attr(data-label); display: block; margin-bottom: 3px; color: #52667a; font-size: 11px; font-weight: 600; text-transform: uppercase; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table .rc-mobile-empty-cell { display: none; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table td:last-child { border-bottom: 0; }
+    html#rc-caixa-page #rc-caixa table.rc-mobile-table tfoot #rc-footer-net { text-align: left; }
+}

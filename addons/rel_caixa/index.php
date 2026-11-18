@@ -1137,6 +1137,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <body>
     <div id="rc-native-top"><?php include('../../topo.php'); ?></div>
     <script src="navbar_layout.js"></script>
+    <script defer src="mobile_tables.js?v=<?php echo rawurlencode($manifestVersion); ?>"></script>
     <script src="relatorio_print.js?v=<?php echo rawurlencode($manifestVersion.'-'.filemtime(__DIR__.'/relatorio_print.js')); ?>"></script>
 
     <div class="container" id="rc-caixa">

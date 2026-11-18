@@ -1,3 +1,8 @@
+# 3.7.19 — 2026-11-17
+
+- No celular, lançamentos e resumos mostram todos os campos em blocos identificados, sem rolagem horizontal.
+- Cabeçalho do provedor quebra o nome em linhas, seguindo a Dashboard.
+
 # 3.7.18 — 2026-11-17
 
 - Atualiza o identificador de cache dos estilos e scripts a cada instalação, inclusive no Safari.
