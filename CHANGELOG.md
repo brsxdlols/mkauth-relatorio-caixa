@@ -1,3 +1,9 @@
+# 3.7.16 — 2026-11-17
+
+- Relatórios simples e detalhados mostram coluna e total de tarifas de boleto separados da saída total.
+- Resumos detalhados incluem tarifas por conta, recebimento, motivo e usuário.
+- Fechamento informa tarifas e outras saídas sem descontar taxas novamente do resultado.
+
 # 3.7.15 — 2026-11-17
 
 - Usa a logo personalizada de mkfiles/logo.jpg, em vez da marca padrão do sistema.
