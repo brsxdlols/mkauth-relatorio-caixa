@@ -16,3 +16,6 @@ const branded=build({...data,provider:{name:'Provedor Exemplo LTDA',cnpj:'11.222
 assert(branded.includes('Provedor Exemplo LTDA'));assert(branded.includes('CNPJ: 11.222.333/0001-44'));assert(branded.includes('alt="Logo do provedor"'));assert(branded.indexOf('Provedor Exemplo LTDA')<branded.indexOf('<h1>Relatório simples'));
 const unsafeLogo=build({...data,provider:{name:'<script>',cnpj:'123',logo:'javascript:alert(1)'}},true);assert(!unsafeLogo.includes('src="javascript'));assert(unsafeLogo.includes('&lt;script&gt;'));
 console.log('OK: identidade do provedor no cabeçalho, CNPJ e logo com conteúdo seguro.');
+
+const identified=build({...data,provider:{name:'Nome do Provedor',legalName:'Razão Social Exemplo LTDA',cnpj:'11.222.333/0001-44',logo:''}},true);assert(identified.includes('Razão social: Razão Social Exemplo LTDA'));assert(identified.indexOf('Nome do Provedor')<identified.indexOf('Razão social:'));assert(identified.indexOf('Razão social:')<identified.indexOf('CNPJ:'));
+console.log('OK: nome do provedor primeiro, razão social e CNPJ separados.');

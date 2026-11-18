@@ -1,3 +1,8 @@
+# 3.7.15 — 2026-11-17
+
+- Usa a logo personalizada de mkfiles/logo.jpg, em vez da marca padrão do sistema.
+- Exibe primeiro o nome do provedor, depois a razão social e o CNPJ em linhas separadas.
+
 # 3.7.14 — 2026-11-17
 
 - Relatórios simples e detalhados começam com nome, CNPJ e logo disponível do provedor, lidos do MK-AUTH.
