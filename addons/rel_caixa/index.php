@@ -950,7 +950,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
     }
 
 </style>
-<link href="responsive_layout.css?v=<?php echo rawurlencode($manifestVersion); ?>" rel="stylesheet" type="text/css" />
+<link href="responsive_layout.css?v=<?php echo rawurlencode($manifestVersion.'-'.filemtime(__DIR__.'/responsive_layout.css')); ?>" rel="stylesheet" type="text/css" />
 
 </head>
 
@@ -1137,7 +1137,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <body>
     <div id="rc-native-top"><?php include('../../topo.php'); ?></div>
     <script src="navbar_layout.js"></script>
-    <script src="relatorio_print.js?v=<?php echo rawurlencode($manifestVersion); ?>"></script>
+    <script src="relatorio_print.js?v=<?php echo rawurlencode($manifestVersion.'-'.filemtime(__DIR__.'/relatorio_print.js')); ?>"></script>
 
     <div class="container" id="rc-caixa">
         <header class="rc-page-header"><div><span class="rc-eyebrow">ADDON</span><h1>Relatório de Caixa</h1></div><span class="rc-app-badge">v<?php echo htmlspecialchars($manifestVersion, ENT_QUOTES, 'UTF-8'); ?></span></header>

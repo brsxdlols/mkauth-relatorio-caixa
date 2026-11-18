@@ -1,5 +1,7 @@
 # 3.7.18 — 2026-11-17
 
+- Atualiza o identificador de cache dos estilos e scripts a cada instalação, inclusive no Safari.
+
 - Atalhos CAIXA SEMANA (domingo a sábado) e CAIXA MÊS (mês atual completo), com datas explícitas e filtros limpos.
 
 - Baixar PDF direto nos modelos Simples e Detalhado, com geração local no navegador e sem cabeçalhos/URLs do Chrome.
