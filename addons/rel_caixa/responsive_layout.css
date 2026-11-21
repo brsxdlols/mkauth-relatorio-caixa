@@ -145,3 +145,21 @@
     html#rc-caixa-page #rc-caixa table.rc-mobile-table td:last-child { border-bottom: 0; }
     html#rc-caixa-page #rc-caixa table.rc-mobile-table tfoot #rc-footer-net { text-align: left; }
 }
+
+/* Match financial headings, values and totals on the same right edge. */
+@media screen and (min-width:901px) {
+    #rc-caixa .finance-table thead th:nth-child(6),
+    #rc-caixa .finance-table thead th:nth-child(7),
+    #rc-caixa .finance-table thead th:nth-child(8),
+    #rc-caixa .finance-table tbody td:nth-child(6),
+    #rc-caixa .finance-table tbody td:nth-child(7),
+    #rc-caixa .finance-table tbody td:nth-child(8),
+    #rc-caixa .finance-table tfoot #rc-footer-incoming,
+    #rc-caixa .finance-table tfoot #rc-footer-extra,
+    #rc-caixa .finance-table tfoot #rc-footer-outgoing {
+        text-align: right;
+        padding-left: 10px;
+        padding-right: 10px;
+        font-variant-numeric: tabular-nums;
+    }
+}

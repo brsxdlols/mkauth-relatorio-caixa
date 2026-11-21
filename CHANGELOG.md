@@ -1,3 +1,7 @@
+# 3.7.20 — 2026-11-21
+
+- Alinha os títulos Entrada, Acréscimos pagos e Saída com os valores e totais da tabela desktop.
+
 # 3.7.19 — 2026-11-17
 
 - No celular, lançamentos e resumos mostram todos os campos em blocos identificados, sem rolagem horizontal.
