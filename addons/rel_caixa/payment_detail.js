@@ -3,8 +3,22 @@
     'use strict';
     var money = function (value) { return (Number(value || 0) / 100).toLocaleString('pt-BR', {style:'currency',currency:'BRL'}); };
     var date = function (value) { return !value || /^0000-00-00/.test(value) ? 'Não informado' : String(value).replace(/^(\d{4})-(\d{2})-(\d{2})/, '$3/$2/$1'); };
+    function linkHistories() {
+        document.querySelectorAll('.finance-table tbody tr').forEach(function (row) {
+            if (!row.querySelector('.rc-title-detail') || !row.cells[4]) return;
+            var cell = row.cells[4], button = document.createElement('button');
+            button.type = 'button'; button.className = 'rc-payment-history';
+            button.textContent = cell.textContent.trim();
+            button.title = 'Ver informações do pagamento do título';
+            cell.textContent = ''; cell.appendChild(button);
+        });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', linkHistories);
+    else linkHistories();
     document.addEventListener('click', function (event) {
-        var trigger = event.target.closest('.rc-title-detail');
+        var opener = event.target.closest('.rc-title-detail, .rc-payment-history');
+        if (!opener) return;
+        var trigger = opener.classList.contains('rc-payment-history') ? opener.closest('tr').querySelector('.rc-title-detail') : opener;
         if (!trigger) return;
         var data;
         try { data = JSON.parse(trigger.dataset.payment); } catch (error) { return; }
@@ -33,7 +47,7 @@
         });
         var previousOverflow = document.documentElement.style.overflow;
         document.documentElement.style.overflow = 'hidden';
-        dialog.addEventListener('close', function () { document.documentElement.style.overflow = previousOverflow; dialog.remove(); trigger.focus(); });
+        dialog.addEventListener('close', function () { document.documentElement.style.overflow = previousOverflow; dialog.remove(); opener.focus(); });
         dialog.querySelector('button').addEventListener('click', function () { dialog.close(); });
         dialog.addEventListener('click', function (e) { if (e.target === dialog) { var box = dialog.getBoundingClientRect(); if (e.clientX < box.left || e.clientX > box.right || e.clientY < box.top || e.clientY > box.bottom) dialog.close(); } });
         document.body.appendChild(dialog); dialog.showModal();

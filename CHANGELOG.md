@@ -1,3 +1,7 @@
+# 3.7.23 — 2026-11-21
+
+- Histórico do lançamento também abre o modal de pagamento, com acesso pelo teclado.
+
 # 3.7.22 — 2026-11-21
 
 - Clique no título abre modal responsivo com dados do pagamento e do lançamento, sem alterar dados financeiros.
