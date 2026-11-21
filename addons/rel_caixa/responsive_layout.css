@@ -163,3 +163,17 @@
         font-variant-numeric: tabular-nums;
     }
 }
+
+/* Client identity stays together; keep the login cell for CSV and report indexes. */
+#rc-caixa .finance-table .rc-client-name { font-weight: 600; line-height: 1.45; }
+#rc-caixa .finance-table .rc-client-login { display: block; margin-top: 4px; color: #52667a; font-size: 12px; font-weight: 400; text-decoration: none; }
+#rc-caixa .finance-table .rc-client-login:hover { color: #076ab7; text-decoration: underline; }
+#rc-caixa .finance-table thead th:nth-child(2),
+#rc-caixa .finance-table tbody td:nth-child(2) { display: none; }
+@media screen and (min-width:901px) {
+    #rc-caixa .finance-table thead th:first-child { width: 29%; }
+    #rc-caixa .finance-table tbody td:first-child > a:first-child { display: block; padding-left: 0; }
+}
+@media screen and (max-width:900px) {
+    html#rc-caixa-page #rc-caixa .finance-table.rc-mobile-table tbody td:nth-child(2) { display: none; }
+}

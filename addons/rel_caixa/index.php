@@ -980,6 +980,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
         if (table) content.push(line(Array.from(table.querySelectorAll('thead th')).map(th => th.textContent)));
         rows.forEach(row => {
             const values = Array.from(row.cells).map(td => td.textContent.trim());
+            values[0] = row.dataset.client || values[0];
             incoming += Number(row.dataset.incoming || 0); outgoing += Number(row.dataset.outgoing || 0) - (tariffsVisible ? 0 : Number(row.dataset.fee || 0)); if (!tariffsVisible && Number(row.dataset.fee || 0) > 0) values[7] = '--'; extras += Number(row.dataset.extra || 0); content.push(line(values));
         });
         content.push(line(['Linhas exportadas', rows.length]), line(['Total entradas', money(incoming)]), line(['Total saídas', money(outgoing)]), line(['Acréscimos identificados (já incluídos nas entradas)', money(extras)]), line(['Resultado das linhas exportadas', money(incoming - outgoing)]));
@@ -1340,14 +1341,16 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $movementType = ($row['entrada'] > 0) ? 'entrada' : (($row['saida'] > 0) ? 'saida' : 'outro');
                                         $rowSearch = $nome_cliente . ' ' . $login . ' ' . $row['historico'] . ' ' . $row['usuario'] . ' ' . $row['_fee_history'];
                                         ?>
-                                        <tr data-account="<?php echo bt_h(!empty($cliente_row['conta_nome']) ? $cliente_row['conta_nome'].' (#'.$cliente_row['numconta'].')' : 'Sem conta identificada'); ?>" data-method="<?php echo bt_h(!empty($cliente_row['formapag']) ? $cliente_row['formapag'] : 'Não informado'); ?>" data-fee="<?php echo (int)$row['_fee_amount']; ?>" data-extra="<?php echo (int)$row['_extra']; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
+                                        <tr data-client="<?php echo bt_h($nome_cliente); ?>" data-account="<?php echo bt_h(!empty($cliente_row['conta_nome']) ? $cliente_row['conta_nome'].' (#'.$cliente_row['numconta'].')' : 'Sem conta identificada'); ?>" data-method="<?php echo bt_h(!empty($cliente_row['formapag']) ? $cliente_row['formapag'] : 'Não informado'); ?>" data-fee="<?php echo (int)$row['_fee_amount']; ?>" data-extra="<?php echo (int)$row['_extra']; ?>" data-incoming="<?php echo (int)round($row['entrada'] * 100); ?>" data-outgoing="<?php echo (int)round($row['saida'] * 100); ?>" class="<?php echo $nomeClienteClass . ' ' . $tarifaRowClass; ?>" data-movement="<?php echo $movementType; ?>" data-search="<?php echo htmlspecialchars($rowSearch, ENT_QUOTES, 'UTF-8'); ?>">
                                             <td>
                                                 <?php
 
                                                 echo '<a href="../../cliente_det.hhvm?uuid=' . htmlspecialchars($uuid_cliente, ENT_QUOTES, 'UTF-8') . '" target="_blank" title="' . htmlspecialchars($nome_cliente, ENT_QUOTES, 'UTF-8') . '">';
-                                                echo '<span class="client-icon-clean" aria-hidden="true"><i class="bi bi-person-circle"></i></span>';
-                                                echo htmlspecialchars($nome_cliente, ENT_QUOTES, 'UTF-8');
+                                                
+                                                echo '<span class="rc-client-name">'.htmlspecialchars($nome_cliente, ENT_QUOTES, 'UTF-8').'</span>';
                                                 echo '</a>';
+                                                $clientFilter = '?' . http_build_query(array('search' => $login, 'data_inicial' => $rc_start->format('Y-m-d'), 'data_final' => $rc_end->format('Y-m-d')));
+                                                if ($login !== '') echo '<a class="rc-client-login" href="'.bt_h($clientFilter).'" title="Filtrar por este login">'.bt_h($login).'</a>';
                                                 ?>
                                             </td>
 

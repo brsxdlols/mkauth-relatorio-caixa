@@ -1,3 +1,7 @@
+# 3.7.21 — 2026-11-21
+
+- Lista de lançamentos sem ícones repetidos, com nome em destaque e login logo abaixo. Preserva filtro por login e exportações.
+
 # 3.7.20 — 2026-11-21
 
 - Alinha os títulos Entrada, Acréscimos pagos e Saída com os valores e totais da tabela desktop.
