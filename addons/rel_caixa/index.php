@@ -1138,6 +1138,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
 <body>
     <div id="rc-native-top"><?php include('../../topo.php'); ?></div>
     <script src="navbar_layout.js"></script>
+    <script defer src="payment_detail.js?v=<?php echo rawurlencode($manifestVersion); ?>"></script>
     <script defer src="mobile_tables.js?v=<?php echo rawurlencode($manifestVersion); ?>"></script>
     <script src="relatorio_print.js?v=<?php echo rawurlencode($manifestVersion.'-'.filemtime(__DIR__.'/relatorio_print.js')); ?>"></script>
 
@@ -1329,7 +1330,7 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                         $matches = array();
                                         preg_match('/t[ií]tulo(?:[^0-9]{0,30})(\d+)/iu', $row['historico'], $matches);
                                         $id = isset($matches[1]) ? $matches[1] : '--';
-                                        $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente, l.formapag, l.numconta, b.nome AS conta_nome FROM sis_lanc l
+                                        $cliente_query = "SELECT c.nome, l.login, c.uuid_cliente, l.formapag, l.numconta, l.valor, l.valorpag, l.status, l.datapag, l.datavenc, b.nome AS conta_nome FROM sis_lanc l
                                             JOIN sis_cliente c ON l.login = c.login
                                             LEFT JOIN sis_boleto b ON b.id = l.numconta
                                             WHERE l.id = '$id'";
@@ -1394,9 +1395,11 @@ $manifestVersion = $Manifest->{'version'} ?? '';
                                             </td>
 
                                             <td>
-                                                <span class="badge badge-info">
-                                                    <img src="img/digital.png" alt="ID" class="icon-sm"> <?php echo $id; ?>
-                                                </span>
+                                                <?php if ($cliente_row && (int)$id > 0):
+                                                    $paymentDetail = array('title'=>(int)$id, 'client'=>$nome_cliente, 'login'=>$login, 'status'=>$cliente_row['status'], 'original'=>bt_cents($cliente_row['valor']), 'paid'=>bt_cents($cliente_row['valorpag']), 'due'=>$cliente_row['datavenc'], 'paidDate'=>$cliente_row['datapag'], 'method'=>$cliente_row['formapag'], 'account'=>!empty($cliente_row['conta_nome'])?$cliente_row['conta_nome'].' (#'.$cliente_row['numconta'].')':'Não identificada', 'movement'=>$row['data'], 'user'=>$row['usuario'], 'incoming'=>bt_cents($row['entrada']), 'outgoing'=>bt_cents($row['saida']), 'extra'=>$row['_extra'], 'fee'=>(int)$row['_fee_amount'], 'history'=>$row['historico']);
+                                                ?>
+                                                <button type="button" class="rc-title-detail" aria-label="Ver pagamento do título <?php echo (int)$id; ?>" data-payment="<?php echo bt_h(json_encode($paymentDetail, JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE)); ?>"><?php echo (int)$id; ?></button>
+                                                <?php else: ?><span><?php echo bt_h($id); ?></span><?php endif; ?>
                                             </td>
 
                                             <td style="font-weight: 500;">

@@ -1,3 +1,7 @@
+# 3.7.22 — 2026-11-21
+
+- Clique no título abre modal responsivo com dados do pagamento e do lançamento, sem alterar dados financeiros.
+
 # 3.7.21 — 2026-11-21
 
 - Lista de lançamentos sem ícones repetidos, com nome em destaque e login logo abaixo. Preserva filtro por login e exportações.
